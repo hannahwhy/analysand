@@ -16,5 +16,9 @@ module Couchdb
     def rows
       body['rows']
     end
+
+    def docs
+      rows.map { |r| r['doc'] }.compact
+    end
   end
 end
