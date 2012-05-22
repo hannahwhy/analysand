@@ -12,7 +12,11 @@ module Couchdb
 
     def initialize(response)
       @response = response
-      @body = JSON.parse(@response.body)
+      @body = JSON.parse(@response.body) unless @response.body.blank?
+    end
+
+    def etag
+      response.get_fields('ETag').first.gsub('"', '')
     end
 
     def success?
