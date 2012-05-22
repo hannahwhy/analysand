@@ -99,6 +99,14 @@ module Couchdb
   #                                   # => #<Response code=401 ...>
   #                                   # => #<Response code=404 ...>
   #
+  # Note: CouchDB treats forward slashes (/) specially.  For document IDs, /
+  # denotes a separator between document ID and the name of an attachment.
+  # This library makes use of that to implement attachment storage and
+  # retrieval (see below).
+  #
+  # If you are using forward slashes in document IDs, you MUST encode them
+  # (i.e. replace / with %2F).
+  #
   #
   # Reading a view
   # --------------
@@ -115,6 +123,40 @@ module Couchdb
   #     resp.rows         # => [ { 'id' => ... }, ... } ]
   #
   # See ViewResponse for more details.
+  #
+  #
+  # Uploading an attachment
+  # -----------------------
+  #
+  #     vdb.put_attachment('doc1/attachment', io, {}, credentials)
+  #       # => #<Response>
+  #
+  # The second argument MUST be an IO-like object.  The third argument MAY
+  # contain any of the following options:
+  #
+  # * :rev: When specified, this will be used as the rev of the document that
+  #   will own the attachment.  When not specified, no rev will be passed in
+  #   the request.  In order to add attachments to existing documents, then,
+  #   you MUST pass this option.
+  # * :content_type: The MIME type of the attachment.
+  #
+  #
+  # Retrieving an attachment
+  # ------------------------
+  #
+  #     vdb.get_attachment('doc1/attachment', credentials) do |resp|
+  #       # resp is a Net::HTTPResponse
+  #     end
+  #
+  # or, if you don't need that level of control when reading the response
+  # body:
+  #
+  #     vdb.get_attachment('doc1/attachment', credentials)
+  #       # => Net::HTTPResponse
+  #
+  # When a block is passed, #get_attachment does not read the response body,
+  # leaving that up to the programmer.  When a block is _not_ passed,
+  # #get_attachment reads the body in full.
   #
   #
   # Pinging a database
@@ -195,12 +237,31 @@ module Couchdb
       http.shutdown
     end
 
-    def put(doc_id, doc, credentials = nil)
+    def put(doc_id, doc, credentials)
       uri = doc_uri(doc_id)
       req = Net::HTTP::Put.new(uri.to_s)
 
       set_credentials(req, credentials)
       req.body = doc.to_json
+
+      Response.new(http.request(uri, req))
+    end
+
+    def put_attachment(loc, io, options, credentials = nil)
+      uri = doc_uri(loc)
+
+      if options[:rev]
+        uri.query = build_query('rev' => options[:rev])
+      end
+
+      req = Net::HTTP::Put.new(uri.to_s)
+      req.body = io.read
+
+      if options[:content_type]
+        req.add_field('Content-Type', options[:content_type])
+      end
+
+      set_credentials(req, credentials)
 
       Response.new(http.request(uri, req))
     end
@@ -222,6 +283,15 @@ module Couchdb
       set_credentials(req, credentials)
 
       Response.new(http.request(uri, req))
+    end
+
+    def get_attachment(loc, credentials = nil, &block)
+      uri = doc_uri(loc)
+      req = Net::HTTP::Get.new(uri.to_s)
+
+      set_credentials(req, credentials)
+
+      http.request(uri, req)
     end
 
     def view(view_name, parameters = {}, credentials = nil)
