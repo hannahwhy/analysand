@@ -285,6 +285,15 @@ module Couchdb
       Response.new(http.request(uri, req))
     end
 
+    def head(doc_id, credentials = nil)
+      uri = doc_uri(doc_id)
+      req = Net::HTTP::Head.new(uri.to_s)
+
+      set_credentials(req, credentials)
+
+      Response.new(http.request(uri, req))
+    end
+
     def get_attachment(loc, credentials = nil, &block)
       uri = doc_uri(loc)
       req = Net::HTTP::Get.new(uri.to_s)
