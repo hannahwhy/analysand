@@ -338,5 +338,13 @@ module Couchdb
         resp.code.should == '200'
       end
     end
+
+    describe '#changes' do
+      it 'receives changes'
+
+      it 'applies filters'
+
+      it 'applies a seq limit'
+    end
   end
 end

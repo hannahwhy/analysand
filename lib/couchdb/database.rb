@@ -170,6 +170,28 @@ module Couchdb
   # #get_attachment reads the body in full.
   #
   #
+  # Watching for changes
+  # --------------------
+  #
+  #     vdb.changes do |change|
+  #       # change is a hash with keys "seq", "id", and "changes"; see [0] for
+  #       # more information
+  #     end
+  #
+  # #changes uses continuous mode and sets up a heartbeat to fire
+  # approximately every 30 seconds.
+  #
+  # Any parameters recognized by CouchDB's changes feed can be passed as
+  # parameters.  For example, if you want to filter and only get changes after
+  # seq 123456, use something like this:
+  #
+  #     vdb.changes(:filter => 'doc/is_video', :since => 123456) do |change|
+  #       ...
+  #     end
+  #
+  # [0]: http://guide.couchdb.org/draft/notifications.html#continuous
+  #
+  #
   # Pinging a database
   # ------------------
   #
