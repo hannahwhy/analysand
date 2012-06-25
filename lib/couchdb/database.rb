@@ -200,6 +200,15 @@ module Couchdb
   #     vdb.ping    # => #<Response code=200 ...>
   #
   #
+  # Getting database status
+  # -----------------------
+  #
+  #     vdb.status # => { "db_name" => "videos", ... }
+  #
+  # The returned hash is a parsed form of the JSON received from a GET on the
+  # database.
+  #
+  #
   # Acceptable credentials
   # ======================
   #
@@ -264,6 +273,10 @@ module Couchdb
       set_credentials(req, credentials)
 
       Response.new(http.request(uri, req))
+    end
+
+    def status(credentials = nil)
+      ping(credentials).body
     end
 
     def close
