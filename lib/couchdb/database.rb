@@ -1,3 +1,4 @@
+require 'couchdb/change_watcher'
 require 'couchdb/errors'
 require 'couchdb/response'
 require 'couchdb/view_response'
@@ -189,6 +190,15 @@ module Couchdb
   #       ...
   #     end
   #
+  # To shut down the change watcher, invoke #stop on the return value:
+  #
+  #     watcher = vdb.changes { |change| ... }
+  #     ...
+  #     watcher.stop
+  #
+  # The watcher runs the supplied block in a separate thread; therefore, the
+  # supplied block MUST be thread-safe.
+  #
   # [0]: http://guide.couchdb.org/draft/notifications.html#continuous
   #
   #
@@ -376,6 +386,19 @@ module Couchdb
       set_credentials(req, credentials)
 
       ViewResponse.new(http.request(uri, req))
+    end
+
+    def changes(options = {}, credentials = nil, &block)
+      opts = options.merge(:feed => 'continuous', :heartbeat => '30000')
+      uri = doc_uri("_changes")
+      uri.query = build_query(opts)
+
+      req = Net::HTTP::Get.new(uri.to_s)
+      set_credentials(req, credentials)
+
+      ChangeWatcher.new(req).tap do |cw|
+        Thread.new { cw.start(credentials, &block) }
+      end
     end
 
     ##
