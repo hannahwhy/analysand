@@ -7,9 +7,8 @@ require 'yajl'
 
 module Couchdb
   ##
-  # A Celluloid::IO actor that watches the changes feed  of a CouchDB
-  # database.  When a change is received, it passes the change to a
-  # #process method.
+  # A Celluloid::IO actor that watches the changes feed of a CouchDB database.
+  # When a change is received, it passes the change to a #process method.
   #
   # ChangeWatchers monitor changes using continuous mode and set up a heartbeat
   # to fire approximately every 10 seconds.
