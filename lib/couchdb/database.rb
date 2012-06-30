@@ -1,4 +1,3 @@
-require 'couchdb/change_watcher'
 require 'couchdb/errors'
 require 'couchdb/response'
 require 'couchdb/view_response'
