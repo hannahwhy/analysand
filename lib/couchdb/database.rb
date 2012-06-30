@@ -1,5 +1,4 @@
 require 'couchdb/change_watcher'
-require 'couchdb/database_reference'
 require 'couchdb/errors'
 require 'couchdb/response'
 require 'couchdb/view_response'
@@ -219,7 +218,6 @@ module Couchdb
   # connection per (uri.host, uri.port, thread) tuple, so connection pooling
   # is also done.
   class Database
-    include DatabaseReference
     include Rack::Utils
 
     JSON_VALUE_PARAMETERS = %w(key keys startkey endkey).map(&:to_sym)
