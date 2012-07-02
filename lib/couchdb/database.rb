@@ -349,7 +349,11 @@ module Couchdb
     end
 
     ##
-    # @private
+    # Sets credentials on a request object.
+    #
+    # If creds is a hash containing :username and :password keys, HTTP basic
+    # authorization is used.  If creds is a string, the string is added as a
+    # cookie.
     def set_credentials(req, creds)
       return unless creds
 
