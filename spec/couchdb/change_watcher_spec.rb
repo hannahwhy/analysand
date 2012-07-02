@@ -6,8 +6,6 @@ require 'thread'
 module Couchdb
   describe ChangeWatcher do
     class TestWatcher < Couchdb::ChangeWatcher
-      include Couchdb::DatabaseReference
-
       attr_accessor :changes
 
       def initialize(database, credentials, mutex, cond)
@@ -21,7 +19,7 @@ module Couchdb
       end
 
       def customize_request(req)
-        set_credentials(req, @credentials)
+        req.basic_auth(@credentials[:username], @credentials[:password])
       end
 
       def process(change)
