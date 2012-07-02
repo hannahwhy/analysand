@@ -1,5 +1,6 @@
 require 'spec_helper'
 
+require 'couchdb/change_watcher'
 require 'thread'
 
 module Couchdb
