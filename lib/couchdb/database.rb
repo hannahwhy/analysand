@@ -1,7 +1,6 @@
 require 'couchdb/errors'
 require 'couchdb/response'
 require 'couchdb/view_response'
-require 'json/ext'
 require 'net/http/persistent'
 require 'rack/utils'
 require 'uri'

@@ -1,3 +1,5 @@
+require 'json/ext'
+
 module Couchdb
   ##
   # The response object is a wrapper around Net::HTTPResponse that provides a
