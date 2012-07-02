@@ -308,9 +308,9 @@ module Couchdb
       uri = doc_uri("_design/#{design_doc}/_view/#{view_name}")
 
       JSON_VALUE_PARAMETERS.each do |p|
-        v = parameters[p]
-
-        parameters[p] = ActiveSupport::JSON.encode(v) if v
+        if parameters.has_key?(p)
+          parameters[p] = parameters[p].to_json
+        end
       end
 
       uri.query = build_query(parameters)
