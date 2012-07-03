@@ -1,3 +1,4 @@
+require 'celluloid'
 require 'celluloid/io'
 require 'http/parser'
 require 'net/http'
@@ -62,6 +63,7 @@ module Couchdb
   # [0]: http://guide.couchdb.org/draft/notifications.html#continuous
   class ChangeWatcher
     include Celluloid::IO
+    include Celluloid::Logger
     include Rack::Utils
 
     # Read at most this many bytes off the socket at a time.
@@ -93,6 +95,8 @@ module Couchdb
 
       @started = true
       @running = true
+
+      info "#{self.class} entering read loop"
 
       while @running
         @socket.wait_readable
@@ -159,9 +163,33 @@ module Couchdb
     ##
     # @private
     def connect
-      @socket = TCPSocket.new(@uri.host, @uri.port)
-      @socket.wait_writable
+      req = prepare_request
 
+      begin
+        info "#{self.class} connecting to #{req.path}"
+
+        @socket = TCPSocket.new(@uri.host, @uri.port)
+        @socket.wait_writable
+
+        # Make the request.
+        data = [
+          "GET #{req.path} HTTP/1.1"
+        ]
+
+        req.each_header { |k, v| data << "#{k}: #{v}" }
+
+        @socket.write(data.join("\r\n"))
+        @socket.write("\r\n\r\n")
+      rescue Errno::ECONNREFUSED => e
+        error "#{self.class} caught #{e.inspect}, will retry in 30 seconds"
+        sleep 30
+        retry
+      end
+    end
+
+    ##
+    # @private
+    def prepare_request
       query = {
         'feed' => 'continuous',
         'heartbeat' => '10000'
@@ -170,19 +198,9 @@ module Couchdb
       customize_query(query)
       q = build_query(query)
 
-      req = Net::HTTP::Get.new(@uri.to_s + "/_changes?#{q}")
-
-      customize_request(req)
-
-      # Make the request.
-      data = [
-        "GET #{req.path} HTTP/1.1"
-      ]
-
-      req.each_header { |k, v| data << "#{k}: #{v}" }
-
-      @socket.write(data.join("\r\n"))
-      @socket.write("\r\n\r\n")
+      Net::HTTP::Get.new(@uri.to_s + "/_changes?#{q}").tap do |req|
+        customize_request(req)
+      end
     end
   end
 end
