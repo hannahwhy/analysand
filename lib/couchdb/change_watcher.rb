@@ -14,7 +14,30 @@ module Couchdb
   # ChangeWatchers monitor changes using continuous mode and set up a heartbeat
   # to fire approximately every 10 seconds.
   #
-  # Example usage:
+  # ChangeWatchers begin watching for changes as soon as they are initialized.
+  # To send a shutdown message:
+  #
+  #     a.stop
+  #
+  # The watcher will terminate on the next heartbeat.
+  #
+  #
+  # Failure modes
+  # =============
+  #
+  # ChangeWatcher deals with the following failures in the following ways:
+  #
+  # * If Errno::ECONNREFUSED is raised whilst connecting to CouchDB, it will
+  #   retry the connection in 30 seconds.
+  # * If the connection to CouchDB's changes feed is abruptly terminated, it
+  #   dies.
+  # * If an exception is raised during HTTP or JSON parsing, it dies.
+  #
+  # Situations where the actor dies should be handled by a supervisor.
+  #
+  #
+  # Example usage
+  # =============
   #
   #     class Accumulator < Couchdb::ChangeWatcher
   #       attr_accessor :results
@@ -44,6 +67,8 @@ module Couchdb
   #
   #       # change is a Hash containing keys id, seq, and changes.  See [0] for
   #       # more information.
+  #       #
+  #       # [0]: http://guide.couchdb.org/draft/notifications.html#continuous
   #       def process(change)
   #         results << change
   #       end
@@ -52,15 +77,6 @@ module Couchdb
   #
   #     # or with supervision:
   #     a = Accumulator.supervise('http://localhost:5984/mydb')
-  #
-  # ChangeWatchers begin watching for changes as soon as they are
-  # initialized.  To send a shutdown message:
-  #
-  #     a.stop
-  #
-  # The watcher will terminate on the next heartbeat.
-  #
-  # [0]: http://guide.couchdb.org/draft/notifications.html#continuous
   class ChangeWatcher
     include Celluloid::IO
     include Celluloid::Logger
