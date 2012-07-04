@@ -247,7 +247,7 @@ module Couchdb
       Response.new(http.request(uri, req))
     end
 
-    def put_attachment(loc, io, options, credentials = nil)
+    def put_attachment(loc, io, credentials = nil, options = {})
       uri = doc_uri(loc)
 
       if options[:rev]

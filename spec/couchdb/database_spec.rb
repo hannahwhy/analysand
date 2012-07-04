@@ -127,30 +127,30 @@ module Couchdb
       end
 
       it 'returns success on attachment creation' do
-        resp = db.put_attachment('doc_id/a', io, {}, admin_credentials)
+        resp = db.put_attachment('doc_id/a', io, admin_credentials)
 
         resp.should be_success
       end
 
       it 'puts an attachment on a document' do
-        db.put_attachment('doc_id/a', io, {}, admin_credentials)
+        db.put_attachment('doc_id/a', io, admin_credentials)
 
         db.get_attachment('doc_id/a').body.should == 'an attachment'
       end
 
       it 'sends rev' do
-        resp = db.put_attachment('doc_id/a', io, {}, admin_credentials)
+        resp = db.put_attachment('doc_id/a', io, admin_credentials)
         rev = resp.body['rev']
         io2 = StringIO.new('an updated attachment')
 
-        db.put_attachment('doc_id/a', io2, { :rev => rev }, admin_credentials)
+        db.put_attachment('doc_id/a', io2, admin_credentials, :rev => rev)
         db.get_attachment('doc_id/a').body.should == 'an updated attachment'
       end
 
       it 'sends content-type' do
         opts = { :content_type => 'text/plain' }
 
-        db.put_attachment('doc_id/a', io, opts, admin_credentials)
+        db.put_attachment('doc_id/a', io, admin_credentials, opts)
         db.get_attachment('doc_id/a').get_fields('Content-Type').should == ['text/plain']
       end
     end
