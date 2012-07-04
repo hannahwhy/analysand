@@ -236,8 +236,9 @@ module Couchdb
       http.shutdown
     end
 
-    def put(doc_id, doc, credentials)
+    def put(doc_id, doc, credentials = nil, options = {})
       uri = doc_uri(doc_id)
+      uri.query = build_query(options)
       req = Net::HTTP::Put.new(uri.to_s)
 
       set_credentials(req, credentials)

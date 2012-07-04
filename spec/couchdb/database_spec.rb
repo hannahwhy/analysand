@@ -76,6 +76,16 @@ module Couchdb
         resp.should be_success
       end
 
+      it 'does not require credentials' do
+        lambda { db.put(docid, doc) }.should_not raise_error(ArgumentError)
+      end
+
+      it 'passes the batch option' do
+        resp = db.put(docid, doc, admin_credentials, :batch => 'ok')
+
+        resp.code.should == '202'
+      end
+
       it 'updates documents' do
         resp = db.put(docid, doc, admin_credentials)
         rev = resp.body['rev']
