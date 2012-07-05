@@ -21,7 +21,7 @@ module Couchdb
     def renew_session(session, timeout, couchdb_uri)
       issued_at = session[:issued_at]
 
-      if Time.now.to_i >= issued_at + (0.9 * timeout)
+      if Time.now.to_f >= issued_at + (0.9 * timeout)
         instance = Instance.new(couchdb_uri)
 
         new_session, _ = instance.renew_session(session)
