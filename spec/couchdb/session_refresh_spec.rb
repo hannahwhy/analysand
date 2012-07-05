@@ -47,8 +47,7 @@ module Couchdb
           new_session = stub
           instance = mock
 
-          instance.should_receive(:renew_session).
-            with(session).and_return([new_session, stub])
+          instance.should_receive(:renew_session).and_return([new_session, stub])
           Instance.stub(:new => instance)
 
           subject.renew_session(session, timeout, uri).should == new_session
