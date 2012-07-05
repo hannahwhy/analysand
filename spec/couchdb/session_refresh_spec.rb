@@ -37,8 +37,10 @@ module Couchdb
           }
         end
 
+        let(:threshold) { (timestamp + (0.9 * timeout)).to_i }
+
         before do
-          Timecop.travel(timestamp + (0.9 * timeout))
+          Timecop.travel(threshold)
         end
 
         it 'renews the session' do
