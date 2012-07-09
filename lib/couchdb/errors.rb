@@ -4,4 +4,8 @@ module Couchdb
 
   class DatabaseError < StandardError
   end
+
+  class DocumentNotSaved < StandardError
+    attr_accessor :response
+  end
 end

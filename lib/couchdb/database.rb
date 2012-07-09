@@ -82,6 +82,18 @@ module Couchdb
   #                                       # => #<Response code=409 ...>
   #
   #
+  # You can also use #put!, which will raise Couchdb::DocumentNotSaved if the
+  # response code is non-success.
+  #
+  #     begin
+  #       vdb.put!(doc_id, doc, credentials)
+  #     rescue Couchdb::DocumentNotSaved => e
+  #       puts "Unable to save #{doc_id}, reason: #{e.response.body}"
+  #     end
+  #
+  # #put!, if it returns, returns the response.
+  #
+  #
   # Deleting a document
   # -------------------
   #
@@ -245,6 +257,16 @@ module Couchdb
       req.body = doc.to_json
 
       Response.new(http.request(uri, req))
+    end
+
+    def put!(doc_id, doc, credentials = nil, options = {})
+      put(doc_id, doc, credentials, options).tap do |resp|
+        unless resp.success?
+          err = Couchdb::DocumentNotSaved.new
+          err.response = resp
+          raise err
+        end
+      end
     end
 
     def put_attachment(loc, io, credentials = nil, options = {})

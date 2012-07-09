@@ -118,6 +118,54 @@ module Couchdb
       end
     end
 
+    describe '#put!' do
+      let(:db) { Database.new(database_uri) }
+      let(:docid) { 'abc123' }
+      let(:doc) do
+        { 'foo' => 'bar' }
+      end
+
+      before do
+        clean_databases!
+      end
+
+      describe 'if the response code is 201' do
+        it 'returns the response' do
+          resp = db.put!(docid, doc, admin_credentials)
+
+          resp.code.should == '201'
+        end
+      end
+
+      describe 'if the response code is 202' do
+        it 'returns the response' do
+          resp = db.put!(docid, doc, admin_credentials, :batch => 'ok')
+
+          resp.code.should == '202'
+        end
+      end
+
+      describe 'if the response code is 409' do
+        before do
+          db.put!(docid, doc, admin_credentials)
+        end
+
+        it 'raises Couchdb::DocumentNotSaved' do
+          lambda { db.put!(docid, doc, admin_credentials) }.should raise_error(Couchdb::DocumentNotSaved)
+        end
+
+        it 'includes the response in the exception' do
+          begin
+            db.put!(docid, doc, admin_credentials)
+          rescue Couchdb::DocumentNotSaved => e
+            code = e.response.code
+          end
+
+          code.should == '409'
+        end
+      end
+    end
+
     describe '#put_attachment' do
       let(:io) { StringIO.new('an attachment') }
       let(:db) { Database.new(database_uri) }
