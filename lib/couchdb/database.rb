@@ -100,6 +100,8 @@ module Couchdb
   #                                          # => #<Response code=401 ...>
   #                                          # => #<Response code=409 ...>
   #
+  # You can also use #delete!, which will raise Couchdb::DocumentNotDeleted if
+  # the response code is non-success.
   #
   #
   # Retrieving a document
@@ -133,6 +135,9 @@ module Couchdb
   #     resp.rows         # => [ { 'id' => ... }, ... } ]
   #
   # See ViewResponse for more details.
+  #
+  # You can also use view!, which will raise Couchdb::CannotAccessView on a
+  # non-success response.
   #
   #
   # Uploading an attachment
@@ -273,11 +278,7 @@ module Couchdb
 
     def put!(doc_id, doc, credentials = nil, options = {})
       put(doc_id, doc, credentials, options).tap do |resp|
-        unless resp.success?
-          err = Couchdb::DocumentNotSaved.new
-          err.response = resp
-          raise err
-        end
+        raise ex(DocumentNotSaved, resp) unless resp.success?
       end
     end
 
@@ -308,6 +309,12 @@ module Couchdb
       req.add_field('If-Match', rev)
 
       Response.new(http.request(uri, req))
+    end
+
+    def delete!(doc_id, rev, credentials = nil)
+      delete(doc_id, rev, credentials).tap do |resp|
+        raise ex(DocumentNotDeleted, resp) unless resp.success?
+      end
     end
 
     def get(doc_id, credentials = nil)
@@ -353,6 +360,12 @@ module Couchdb
       set_credentials(req, credentials)
 
       ViewResponse.new(http.request(uri, req))
+    end
+
+    def view!(view_name, parameters = {}, credentials = nil)
+      view(view_name, parameters, credentials).tap do |resp|
+        raise ex(CannotAccessView, resp) unless resp.success?
+      end
     end
 
     ##
@@ -403,6 +416,14 @@ module Couchdb
     # @private
     def doc_uri(doc_id)
       URI(uri.to_s + URI.escape(doc_id))
+    end
+
+    ##
+    # @private
+    def ex(klass, response)
+      klass.new("Expected response to have code 2xx, got #{response.code} instead").tap do |ex|
+        ex.response = response
+      end
     end
   end
 end

@@ -258,6 +258,47 @@ module Couchdb
       end
     end
 
+    describe '#delete!' do
+      let(:db) { Database.new(database_uri) }
+      let(:docid) { 'abc123' }
+      let(:doc) do
+        { 'foo' => 'bar' }
+      end
+
+      before do
+        clean_databases!
+
+        @resp = db.put!(docid, doc, admin_credentials)
+      end
+
+      describe 'on success' do
+        it 'deletes documents' do
+          rev = @resp.body['rev']
+          resp = db.delete!(docid, rev, admin_credentials)
+
+          resp.should be_success
+        end
+      end
+
+      describe 'if the response code is 400' do
+        it 'raises Couchdb::DocumentNotDeleted' do
+          lambda { db.delete!(docid, 'wrong', admin_credentials) }.should raise_error(Couchdb::DocumentNotDeleted)
+        end
+
+        it 'includes the response in the exception' do
+          code = nil
+
+          begin
+            db.delete!(docid, 'wrong', admin_credentials)
+          rescue Couchdb::DocumentNotDeleted => e
+            code = e.response.code
+          end
+
+          code.should == '400'
+        end
+      end
+    end
+
     describe '#view' do
       let(:db) { Database.new(database_uri) }
 
@@ -337,6 +378,32 @@ module Couchdb
         resp = db.view('doc/a_view', { :skip => 1 }, members_credentials['member1'])
 
         resp.code.should == '200'
+      end
+    end
+
+    describe '#view!' do
+      let(:db) { Database.new(database_uri) }
+
+      before do
+        clean_databases!
+      end
+
+      describe 'if the response code is 404' do
+        it 'raises Couchdb::CannotAccessView' do
+          lambda { db.view!('unknown/view') }.should raise_error(Couchdb::CannotAccessView)
+        end
+
+        it 'includes the response in the exception' do
+          code = nil
+
+          begin
+            db.view!('unknown/view')
+          rescue Couchdb::CannotAccessView => e
+            code = e.response.code
+          end
+
+          code.should == '404'
+        end
       end
     end
   end

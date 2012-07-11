@@ -8,4 +8,12 @@ module Couchdb
   class DocumentNotSaved < StandardError
     attr_accessor :response
   end
+
+  class DocumentNotDeleted < StandardError
+    attr_accessor :response
+  end
+
+  class CannotAccessView < StandardError
+    attr_accessor :response
+  end
 end
