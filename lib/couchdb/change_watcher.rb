@@ -42,46 +42,22 @@ module Couchdb
   #     class Accumulator < Couchdb::ChangeWatcher
   #       attr_accessor :results
   #
-  #       # database may be either a URL-as-string or a Couchdb::Database.
-  #       If overriding the initializer, you MUST call super.
   #       def initialize(database)
   #         super(database)
   #
   #         self.results = []
   #       end
   #
-  #       # Can be used to set query parameters.  query is a Hash.
-  #       # The query hash has two default parameters:
-  #       #
-  #       # | Key       | Value      |
-  #       # | feed      | continuous |
-  #       # | heartbeat | 10000      |
-  #       #
-  #       # It is NOT RECOMMENDED that they be changed.
-  #       def customize_query(query)
   #       end
   #
-  #       # Can be used to add headers.  req is a Net::HTTP::Get instance.
-  #       def customize_request(req)
   #       end
   #
-  #       # change is a Hash containing keys id, seq, and changes.  See [0] for
-  #       # more information.
-  #       #
-  #       # [0]: http://guide.couchdb.org/draft/notifications.html#continuous
   #       def process(change)
   #         results << change
   #
   #         # Once a ChangeWatcher has successfully processed a change, it
   #         # SHOULD invoke change_processed.
   #         change_processed(change)
-  #       end
-  #
-  #       # change_processed SHOULD call super to support usage of #waiter_for.
-  #       def change_processed(change)
-  #         super
-  #
-  #         # something else here
   #       end
   #     end
   #
@@ -109,6 +85,13 @@ module Couchdb
       klass.send(:include, Celluloid::IO)
     end
 
+    ##
+    # Checks services.  If all services pass muster, enters a read loop.
+    #
+    # The database parameter may be either a URL-as-string or a
+    # Couchdb::Database.
+    #
+    # If overriding the initializer, you MUST call super.
     def initialize(database)
       @db = database
       @waiting = {}
@@ -148,17 +131,35 @@ module Couchdb
     end
 
     ##
+    # Can be used to set query parameters.  query is a Hash.  The query hash
+    # has two default parameters:
+    #
+    # | Key       | Value      |
+    # | feed      | continuous |
+    # | heartbeat | 10000      |
+    #
+    # It is NOT RECOMMENDED that they be changed.
+    #
     # By default, this does nothing.  Provide behavior in a subclass.
     def customize_query(query)
     end
 
     ##
+    # Can be used to add headers.  req is a Net::HTTP::Get instance.
+    #
     # By default, this does nothing.  Provide behavior in a subclass.
     def customize_request(req)
     end
 
     ##
+    # This method should implement your change-processing logic.
+    #
+    # change is a Hash containing keys id, seq, and changes.  See [0] for
+    # more information.
+    #
     # By default, this does nothing.  Provide behavior in a subclass.
+    #
+    # [0]: http://guide.couchdb.org/draft/notifications.html#continuous
     def process(change)
     end
 
