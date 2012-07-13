@@ -56,7 +56,7 @@ module Couchdb
   #         results << change
   #
   #         # Once a ChangeWatcher has successfully processed a change, it
-  #         # SHOULD invoke change_processed.
+  #         # SHOULD invoke #change_processed.
   #         change_processed(change)
   #       end
   #     end
