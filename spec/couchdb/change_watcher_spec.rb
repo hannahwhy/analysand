@@ -24,6 +24,7 @@ module Couchdb
 
       def process(change)
         changes << change
+        change_processed(change)
 
         @mutex.synchronize { @cond.signal }
       end
@@ -52,6 +53,25 @@ module Couchdb
       mutex.synchronize { ready.wait(mutex, 1) }
 
       watcher.changes.select { |r| r['id'] == 'foo' }.length.should == 1
+    end
+
+    describe '#waiter_for' do
+      let!(:watcher) { TestWatcher.new(db, admin_credentials, mutex, ready) }
+
+      describe 'if the given document has not been processed' do
+        it 'blocks until the document has been processed' do
+          waiter = watcher.waiter_for('bar')
+
+          Thread.new do
+            db.put('foo', { 'foo' => 'bar' }, admin_credentials)
+            db.put('bar', { 'foo' => 'bar' }, admin_credentials)
+          end
+
+          waiter.wait
+
+          watcher.changes.detect { |r| r['id'] == 'foo' }.should_not be_nil
+        end
+      end
     end
   end
 end

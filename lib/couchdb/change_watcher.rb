@@ -71,7 +71,19 @@ module Couchdb
   #       # [0]: http://guide.couchdb.org/draft/notifications.html#continuous
   #       def process(change)
   #         results << change
+  #
+  #         # Once a ChangeWatcher has successfully processed a change, it
+  #         # SHOULD invoke change_processed.
+  #         change_processed(change)
   #       end
+  #
+  #       # change_processed SHOULD call super to support usage of #waiter_for.
+  #       def change_processed(change)
+  #         super
+  #
+  #         # something else here
+  #       end
+  #     end
   #
   #     a = Accumulator.new('http://localhost:5984/mydb')
   #
@@ -99,6 +111,7 @@ module Couchdb
 
     def initialize(database)
       @db = database
+      @waiting = {}
 
       start!
     end
@@ -147,6 +160,32 @@ module Couchdb
     ##
     # By default, this does nothing.  Provide behavior in a subclass.
     def process(change)
+    end
+
+    class Waiter < Celluloid::Future
+      alias_method :wait, :value
+    end
+
+    ##
+    # Returns an object that can be used to block a thread until a document
+    # with the given ID has been processed.
+    #
+    # Intended for testing.
+    def waiter_for(id)
+      @waiting[id] = true
+
+      Waiter.new do
+        loop do
+          break true if !@waiting[id]
+          sleep 0.1
+        end
+      end
+    end
+
+    ##
+    # Notify waiters.
+    def change_processed(change)
+      @waiting.delete(change['id'])
     end
 
     ##
