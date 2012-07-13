@@ -37,6 +37,19 @@ module Couchdb
       drop_databases!
     end
 
+    describe '#changes_feed_uri' do
+      let!(:watcher) { TestWatcher.new(db, admin_credentials) }
+
+      describe 'when invoked multiple times' do
+        it 'returns what it returned the first time' do
+          uri1 = watcher.changes_feed_uri
+          uri2 = watcher.changes_feed_uri
+
+          uri1.should == uri2
+        end
+      end
+    end
+
     describe '#waiter_for' do
       let!(:watcher) { TestWatcher.new(db, admin_credentials) }
 

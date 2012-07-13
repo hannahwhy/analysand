@@ -48,10 +48,6 @@ module Couchdb
   #         self.results = []
   #       end
   #
-  #       end
-  #
-  #       end
-  #
   #       def process(change)
   #         results << change
   #
@@ -99,16 +95,80 @@ module Couchdb
       start!
     end
 
+    # The URI of the changes feed.  This URI incorporates any changes
+    # made by customize_query.
+    def changes_feed_uri
+      query = {
+        'feed' => 'continuous',
+        'heartbeat' => '10000'
+      }
+
+      customize_query(query)
+
+      uri = (@db.respond_to?(:uri) ? @db.uri : URI(@db)).dup
+      uri.path += '/_changes'
+      uri.query = build_query(query)
+      uri
+    end
+
+    # The connection_ok method is called before connecting to the changes feed.
+    # By default, it checks that there's an HTTP service listening on the
+    # changes feed.
+    #
+    # If the method returns true, then we connect to the changes feed and begin
+    # processing.  If it returns false, a warning message is logged and the
+    # connection check will be retried in 30 seconds.
+    #
+    # This method can be overridden if you need to check additional services.
+    # When you override the method, make sure that you don't discard the return
+    # value of the original definition:
+    #
+    #     # Wrong
+    #     def connection_ok
+    #       super
+    #       ...
+    #     end
+    #
+    #     # Right
+    #     def connection_ok
+    #       ok = super
+    #
+    #       ok && my_other_test
+    #     end
+    def connection_ok
+      uri = changes_feed_uri
+
+      begin
+        socket = TCPSocket.new(uri.host, uri.port)
+        true
+      rescue Errno::ECONNREFUSED => e
+        error "#{uri.host}:#{uri.port} refused connection"
+        false
+      rescue => e
+        error "#{e.class} (#{e.message}) caught while attempting connection to #{uri.host}:#{uri.port}"
+        error e.backtrace.join("\n")
+        false
+      ensure
+        socket.close if socket && !socket.closed?
+      end
+    end
+
     def start
       return if @started
+
+      @started = true
+
+      while !connection_ok
+        error "Some services used by #{self.class.name} did not check out ok; will retry in 30 seconds"
+        sleep 30
+      end
 
       prepare
       connect
 
-      @started = true
-      @running = true
-
       info "#{self.class} entering read loop"
+
+      @running = true
 
       while @running
         @socket.wait_readable
@@ -210,7 +270,6 @@ module Couchdb
     ##
     # @private
     def prepare
-      @uri = @db.respond_to?(:uri) ? @db.uri : URI(@db)
       @http_parser = Http::Parser.new(self)
       @json_parser = Yajl::Parser.new
       @json_parser.on_parse_complete = lambda { |doc| process(doc) }
@@ -220,41 +279,28 @@ module Couchdb
     # @private
     def connect
       req = prepare_request
+      uri = changes_feed_uri
 
-      begin
-        info "#{self.class} connecting to #{req.path}"
+      info "#{self.class} connecting to #{req.path}"
 
-        @socket = TCPSocket.new(@uri.host, @uri.port)
-        @socket.wait_writable
+      @socket = TCPSocket.new(uri.host, uri.port)
+      @socket.wait_writable
 
-        # Make the request.
-        data = [
-          "GET #{req.path} HTTP/1.1"
-        ]
+      # Make the request.
+      data = [
+        "GET #{req.path} HTTP/1.1"
+      ]
 
-        req.each_header { |k, v| data << "#{k}: #{v}" }
+      req.each_header { |k, v| data << "#{k}: #{v}" }
 
-        @socket.write(data.join("\r\n"))
-        @socket.write("\r\n\r\n")
-      rescue Errno::ECONNREFUSED => e
-        error "#{self.class} caught #{e.inspect}, will retry in 30 seconds"
-        sleep 30
-        retry
-      end
+      @socket.write(data.join("\r\n"))
+      @socket.write("\r\n\r\n")
     end
 
     ##
     # @private
     def prepare_request
-      query = {
-        'feed' => 'continuous',
-        'heartbeat' => '10000'
-      }
-
-      customize_query(query)
-      q = build_query(query)
-
-      Net::HTTP::Get.new(@uri.to_s + "/_changes?#{q}").tap do |req|
+      Net::HTTP::Get.new(changes_feed_uri.to_s).tap do |req|
         customize_request(req)
       end
     end
