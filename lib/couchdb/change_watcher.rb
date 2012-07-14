@@ -1,5 +1,6 @@
 require 'celluloid'
 require 'celluloid/io'
+require 'couchdb/connection_testing'
 require 'http/parser'
 require 'net/http'
 require 'rack/utils'
@@ -64,6 +65,7 @@ module Couchdb
   class ChangeWatcher
     include Celluloid::IO
     include Celluloid::Logger
+    include ConnectionTesting
     include Rack::Utils
 
     # Read at most this many bytes off the socket at a time.
@@ -136,21 +138,7 @@ module Couchdb
     #       ok && my_other_test
     #     end
     def connection_ok
-      uri = changes_feed_uri
-
-      begin
-        socket = TCPSocket.new(uri.host, uri.port)
-        true
-      rescue Errno::ECONNREFUSED => e
-        error "#{uri.host}:#{uri.port} refused connection"
-        false
-      rescue => e
-        error "#{e.class} (#{e.message}) caught while attempting connection to #{uri.host}:#{uri.port}"
-        error e.backtrace.join("\n")
-        false
-      ensure
-        socket.close if socket && !socket.closed?
-      end
+      test_http_connection(changes_feed_uri)
     end
 
     def start
