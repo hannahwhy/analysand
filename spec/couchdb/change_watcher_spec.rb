@@ -34,6 +34,8 @@ module Couchdb
     end
 
     after do
+      Celluloid.shutdown
+
       drop_databases!
     end
 
