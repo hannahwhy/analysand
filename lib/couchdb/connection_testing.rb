@@ -5,8 +5,8 @@ module Couchdb
     # redirection code, returns true; otherwise, returns false.
     def test_http_connection(uri)
       begin
-        resp = Net::HTTP.start(uri.host, uri.port) { |h| h.head(uri.path) }
-      
+        resp = Net::HTTP.start(uri.host, uri.port) { |h| h.head(uri.request_uri) }
+
         case resp
         when Net::HTTPSuccess then true
         when Net::HTTPRedirection then true
