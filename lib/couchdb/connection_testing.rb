@@ -1,5 +1,9 @@
+require 'celluloid/logger'
+
 module Couchdb
   module ConnectionTesting
+    include Celluloid::Logger
+
     ##
     # Issues a HEAD request to the given URI.  If it responds with a success or
     # redirection code, returns true; otherwise, returns false.
