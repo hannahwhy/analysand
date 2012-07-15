@@ -24,5 +24,23 @@ module Couchdb
         false
       end
     end
+
+    ##
+    # Periodically checks a URI for success using test_http_connection, and
+    # raises an error if test_http_connection does not return success before
+    # the timeout is reached.
+    def wait_for_http_service(uri, timeout = 30)
+      state = 1.upto(timeout) do
+        if test_http_connection(Catalog::Settings.solr_uri)
+          break :started
+        else
+          sleep 1
+        end
+      end
+
+      unless state == :started
+        raise "#{uri.to_s} took longer than #{timeout} seconds to return a success response"
+      end
+    end
   end
 end
