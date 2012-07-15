@@ -15,11 +15,11 @@ module Couchdb
         when Net::HTTPSuccess then true
         when Net::HTTPRedirection then true
         else
-          error "Expected HEAD #{uri} to return 200, got #{resp.code} (#{resp.body}) instead"
+          error "Expected HEAD #{uri.to_s} to return 200, got #{resp.code} (#{resp.body}) instead"
           false
         end
       rescue => e
-        error "#{e.class} (#{e.message}) caught while attempting connection to #{uri}"
+        error "#{e.class} (#{e.message}) caught while attempting connection to #{uri.to_s}"
         error e.backtrace.join("\n")
         false
       end
