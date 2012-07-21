@@ -166,6 +166,38 @@ module Couchdb
       end
     end
 
+    describe '#get!' do
+      before do
+        clean_databases!
+
+        db.put!('foo', { 'foo' => 'bar' })
+      end
+
+      describe 'if the response code is 200' do
+        it 'returns the document' do
+          db.get!('foo').body['foo'].should == 'bar'
+        end
+      end
+
+      describe 'if the response code is 404' do
+        it 'raises Couchdb::CannotAccessDocument' do
+          lambda { db.get!('bar') }.should raise_error(Couchdb::CannotAccessDocument)
+        end
+
+        it 'includes the response in the exception' do
+          code = nil
+
+          begin
+            db.get!('bar')
+          rescue Couchdb::CannotAccessDocument => e
+            code = e.response.code
+          end
+
+          code.should == '404'
+        end
+      end
+    end
+
     describe '#put_attachment' do
       let(:io) { StringIO.new('an attachment') }
 

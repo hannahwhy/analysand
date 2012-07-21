@@ -13,6 +13,10 @@ module Couchdb
     attr_accessor :response
   end
 
+  class CannotAccessDocument < StandardError
+    attr_accessor :response
+  end
+
   class CannotAccessView < StandardError
     attr_accessor :response
   end

@@ -119,6 +119,9 @@ module Couchdb
   # If you are using forward slashes in document IDs, you MUST encode them
   # (i.e. replace / with %2F).
   #
+  # You can also use #get!, which will raise Couchdb::CannotAccessDocument if
+  # the response code is non-success.
+  #
   #
   # Reading a view
   # --------------
@@ -324,6 +327,12 @@ module Couchdb
       set_credentials(req, credentials)
 
       Response.new(http.request(uri, req))
+    end
+
+    def get!(doc_id, credentials = nil)
+      get(doc_id, credentials).tap do |resp|
+        raise ex(CannotAccessDocument, resp) unless resp.success?
+      end
     end
 
     def head(doc_id, credentials = nil)
