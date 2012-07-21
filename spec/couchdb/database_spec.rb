@@ -9,6 +9,7 @@ module Couchdb
   describe Database do
     let(:database_name) { "catalog_database_#{Rails.env}" }
     let(:database_uri) { instance_uri + "/#{database_name}" }
+    let(:db) { Database.new(database_uri) }
 
     describe '#initialize' do
       it 'requires an absolute URI' do
@@ -55,7 +56,6 @@ module Couchdb
     end
 
     describe '#put' do
-      let(:db) { Database.new(database_uri) }
       let(:docid) { 'abc123' }
       let(:doc) do
         { 'foo' => 'bar' }
@@ -120,7 +120,6 @@ module Couchdb
     end
 
     describe '#put!' do
-      let(:db) { Database.new(database_uri) }
       let(:docid) { 'abc123' }
       let(:doc) do
         { 'foo' => 'bar' }
@@ -169,7 +168,6 @@ module Couchdb
 
     describe '#put_attachment' do
       let(:io) { StringIO.new('an attachment') }
-      let(:db) { Database.new(database_uri) }
 
       before do
         clean_databases!
@@ -206,7 +204,6 @@ module Couchdb
 
     describe '#get_attachment' do
       let(:io) { StringIO.new('an attachment') }
-      let(:db) { Database.new(database_uri) }
 
       before do
         clean_databases!
@@ -222,7 +219,6 @@ module Couchdb
     end
 
     describe '#delete' do
-      let(:db) { Database.new(database_uri) }
       let(:docid) { 'abc123' }
       let(:doc) do
         { 'foo' => 'bar' }
@@ -259,7 +255,6 @@ module Couchdb
     end
 
     describe '#delete!' do
-      let(:db) { Database.new(database_uri) }
       let(:docid) { 'abc123' }
       let(:doc) do
         { 'foo' => 'bar' }
@@ -300,8 +295,6 @@ module Couchdb
     end
 
     describe '#view' do
-      let(:db) { Database.new(database_uri) }
-
       before do
         clean_databases!
 
@@ -382,8 +375,6 @@ module Couchdb
     end
 
     describe '#view!' do
-      let(:db) { Database.new(database_uri) }
-
       before do
         clean_databases!
       end
