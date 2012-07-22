@@ -5,7 +5,7 @@ require 'analysand/instance'
 require 'uri'
 require 'vcr'
 
-require File.expand_path('../../shared/models/a_session_grantor', __FILE__)
+require File.expand_path('../a_session_grantor', __FILE__)
 
 module Analysand
   describe Instance do
