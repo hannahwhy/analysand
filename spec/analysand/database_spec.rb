@@ -396,7 +396,7 @@ module Analysand
           }
         }
 
-        db.put('_security', security, admin_credentials)
+        db.put!('_security', security, admin_credentials)
 
         resp = db.view('doc/a_view', { :skip => 1 }, member1_credentials)
 
