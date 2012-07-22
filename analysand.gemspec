@@ -14,4 +14,13 @@ Gem::Specification.new do |gem|
   gem.name          = "analysand"
   gem.require_paths = ["lib"]
   gem.version       = Analysand::VERSION
+
+  gem.add_dependency 'celluloid'
+  gem.add_dependency 'celluloid-io'
+  gem.add_dependency 'http_parser.rb'
+  gem.add_dependency 'net-http-persistent'
+  gem.add_dependency 'rack'
+  gem.add_dependency 'yajl-ruby'
+
+  gem.add_development_dependency 'rspec'
 end
