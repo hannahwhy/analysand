@@ -1,5 +1,7 @@
 require 'spec_helper'
 
+require 'analysand/view_response'
+
 module Analysand
   describe ViewResponse do
     describe '#docs' do

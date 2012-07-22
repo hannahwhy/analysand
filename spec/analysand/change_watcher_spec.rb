@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 require 'analysand/change_watcher'
+require 'analysand/database'
+require 'celluloid'
 
 module Analysand
   describe ChangeWatcher do

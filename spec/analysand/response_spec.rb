@@ -1,5 +1,8 @@
 require 'spec_helper'
 
+require 'analysand/database'
+require 'analysand/response'
+
 module Analysand
   describe Response do
     let(:database_name) { "catalog_database_#{Rails.env}" }

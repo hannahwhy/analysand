@@ -1,5 +1,6 @@
-require 'base64'
 require 'analysand/errors'
+require 'base64'
+require 'json/ext'
 require 'net/http/persistent'
 require 'uri'
 
