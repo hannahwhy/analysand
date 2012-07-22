@@ -25,7 +25,7 @@ module Analysand
       end
 
       describe 'given member credentials' do
-        let(:credentials) { members_credentials['member1'] }
+        let(:credentials) { member1_credentials }
 
         it_should_behave_like 'a session grantor'
       end

@@ -7,8 +7,6 @@ require 'uri'
 
 module Analysand
   describe Database do
-    let(:database_name) { "catalog_database_#{Rails.env}" }
-    let(:database_uri) { instance_uri + "/#{database_name}" }
     let(:db) { Database.new(database_uri) }
 
     describe '#initialize' do
@@ -393,14 +391,14 @@ module Analysand
       it 'passes credentials' do
         security = {
           'members' => {
-            'names' => ['member1'],
+            'names' => [member1_username],
             'roles' => []
           }
         }
 
         db.put('_security', security, admin_credentials)
 
-        resp = db.view('doc/a_view', { :skip => 1 }, members_credentials['member1'])
+        resp = db.view('doc/a_view', { :skip => 1 }, member1_credentials)
 
         resp.code.should == '200'
       end
