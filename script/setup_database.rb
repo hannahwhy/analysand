@@ -8,7 +8,7 @@ include TestParameters
 
 admin_command = ['curl',
                  '-X PUT',
-                 %Q{--data-binary \"#{admin_password}\"},
+                 %Q{--data-binary '"#{admin_password}"'},
                  "#{instance_uri}/_config/admins/#{admin_username}"
 ].join(' ')
 
