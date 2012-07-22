@@ -1,0 +1,25 @@
+Analysand - a terrible burden for a couch
+-----------------------------------------
+
+Analysand is a CouchDB client library of dubious worth.  It was extracted from
+https://github.com/amvorg-underground/catalog.
+
+Features:
+
+* GET, PUT, DELETE on databases
+* GET, PUT, DELETE, HEAD on documents
+* GET on views
+* POST /_session
+* Celluloid::IO-based change feed watchers
+* Cookie and HTTP Basic authentication for all of the above
+
+
+Developing Analysand
+--------------------
+
+You'll need a CouchDB >= 1.1.0 instance.  I recommend not using a CouchDB
+instance that you're using for anything else; Analysand requires the presence
+of specific admin and non-admin users for its test suite.
+
+See spec/support/test_parameters.rb for usernames, passwords, and connection
+information.
