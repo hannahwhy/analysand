@@ -13,7 +13,7 @@ Features:
 * POST /_session
 * Celluloid::IO-based change feed watchers
 * Cookie and HTTP Basic authentication for all of the above
-
+* Database objects can be safely shared across threads
 
 Developing Analysand
 --------------------
