@@ -23,3 +23,8 @@ of specific admin and non-admin users for its test suite.
 
 See spec/support/test_parameters.rb for usernames, passwords, and connection
 information.
+
+License
+-------
+
+Copyright 2012 David Yip; made available under the MIT license.
