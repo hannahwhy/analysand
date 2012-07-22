@@ -1,0 +1,40 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: http://admin:admin@localhost:5984/analysand_test/abc123
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - ! '*/*'
+      User-Agent:
+      - Ruby
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - 30
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - CouchDB/1.3.0a-d6ab08d-git (Erlang OTP/R15B)
+      Etag:
+      - ! '"1-967a00dff5e02add41819138abb3284d"'
+      Date:
+      - Tue, 22 May 2012 14:21:26 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '61'
+      Cache-Control:
+      - must-revalidate
+    body:
+      encoding: US-ASCII
+      string: ''
+    http_version:
+  recorded_at: Tue, 22 May 2012 14:21:26 GMT
+recorded_with: VCR 2.0.1
