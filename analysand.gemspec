@@ -4,8 +4,8 @@ require File.expand_path('../lib/analysand/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["David Yip"]
   gem.email         = ["yipdw@member.fsf.org"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{A terrible burden for a couch}
+  gem.summary       = %q{A CouchDB client of dubious worth}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
