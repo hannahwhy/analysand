@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Couchdb
+module Analysand
   describe ViewResponse do
     describe '#docs' do
       let(:resp_with_docs) do

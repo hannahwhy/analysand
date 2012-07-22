@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-require 'couchdb/errors'
-require 'couchdb/instance'
+require 'analysand/errors'
+require 'analysand/instance'
 require 'uri'
 require 'vcr'
 
 require File.expand_path('../../shared/models/a_session_grantor', __FILE__)
 
-module Couchdb
+module Analysand
   describe Instance do
     describe '#initialize' do
       it 'requires an absolute URI' do

@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-require 'couchdb/database'
-require 'couchdb/errors'
+require 'analysand/database'
+require 'analysand/errors'
 require 'thread'
 require 'uri'
 
-module Couchdb
+module Analysand
   describe Database do
     let(:database_name) { "catalog_database_#{Rails.env}" }
     let(:database_uri) { instance_uri + "/#{database_name}" }
@@ -150,14 +150,14 @@ module Couchdb
           db.put!(docid, doc, admin_credentials)
         end
 
-        it 'raises Couchdb::DocumentNotSaved' do
-          lambda { db.put!(docid, doc, admin_credentials) }.should raise_error(Couchdb::DocumentNotSaved)
+        it 'raises Analysand::DocumentNotSaved' do
+          lambda { db.put!(docid, doc, admin_credentials) }.should raise_error(Analysand::DocumentNotSaved)
         end
 
         it 'includes the response in the exception' do
           begin
             db.put!(docid, doc, admin_credentials)
-          rescue Couchdb::DocumentNotSaved => e
+          rescue Analysand::DocumentNotSaved => e
             code = e.response.code
           end
 
@@ -180,8 +180,8 @@ module Couchdb
       end
 
       describe 'if the response code is 404' do
-        it 'raises Couchdb::CannotAccessDocument' do
-          lambda { db.get!('bar') }.should raise_error(Couchdb::CannotAccessDocument)
+        it 'raises Analysand::CannotAccessDocument' do
+          lambda { db.get!('bar') }.should raise_error(Analysand::CannotAccessDocument)
         end
 
         it 'includes the response in the exception' do
@@ -189,7 +189,7 @@ module Couchdb
 
           begin
             db.get!('bar')
-          rescue Couchdb::CannotAccessDocument => e
+          rescue Analysand::CannotAccessDocument => e
             code = e.response.code
           end
 
@@ -308,8 +308,8 @@ module Couchdb
       end
 
       describe 'if the response code is 400' do
-        it 'raises Couchdb::DocumentNotDeleted' do
-          lambda { db.delete!(docid, 'wrong', admin_credentials) }.should raise_error(Couchdb::DocumentNotDeleted)
+        it 'raises Analysand::DocumentNotDeleted' do
+          lambda { db.delete!(docid, 'wrong', admin_credentials) }.should raise_error(Analysand::DocumentNotDeleted)
         end
 
         it 'includes the response in the exception' do
@@ -317,7 +317,7 @@ module Couchdb
 
           begin
             db.delete!(docid, 'wrong', admin_credentials)
-          rescue Couchdb::DocumentNotDeleted => e
+          rescue Analysand::DocumentNotDeleted => e
             code = e.response.code
           end
 
@@ -412,8 +412,8 @@ module Couchdb
       end
 
       describe 'if the response code is 404' do
-        it 'raises Couchdb::CannotAccessView' do
-          lambda { db.view!('unknown/view') }.should raise_error(Couchdb::CannotAccessView)
+        it 'raises Analysand::CannotAccessView' do
+          lambda { db.view!('unknown/view') }.should raise_error(Analysand::CannotAccessView)
         end
 
         it 'includes the response in the exception' do
@@ -421,7 +421,7 @@ module Couchdb
 
           begin
             db.view!('unknown/view')
-          rescue Couchdb::CannotAccessView => e
+          rescue Analysand::CannotAccessView => e
             code = e.response.code
           end
 

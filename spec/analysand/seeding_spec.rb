@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-require 'couchdb/seeding'
+require 'analysand/seeding'
 require 'fileutils'
 require 'tmpdir'
 
-module Couchdb
+module Analysand
   describe Seeding do
     include FileUtils
     include Seeding
@@ -51,7 +51,7 @@ module Couchdb
       end
 
       it 'creates documents' do
-        db = Couchdb::Database.new(instance_uri + "/#{database_name}")
+        db = Analysand::Database.new(instance_uri + "/#{database_name}")
 
         seed_docs(instance_uri + "/#{database_name}", admin_credentials)
 
@@ -60,7 +60,7 @@ module Couchdb
       end
 
       it 'updates documents' do
-        db = Couchdb::Database.new(instance_uri + "/#{database_name}")
+        db = Analysand::Database.new(instance_uri + "/#{database_name}")
 
         seed_docs(instance_uri + "/#{database_name}", admin_credentials)
 
@@ -88,7 +88,7 @@ module Couchdb
       end
 
       it 'creates design documents' do
-        db = Couchdb::Database.new(instance_uri + "/#{database_name}")
+        db = Analysand::Database.new(instance_uri + "/#{database_name}")
 
         seed_design_docs(instance_uri + "/#{database_name}", admin_credentials)
 
@@ -97,7 +97,7 @@ module Couchdb
       end
 
       it 'updates design documents' do
-        db = Couchdb::Database.new(instance_uri + "/#{database_name}")
+        db = Analysand::Database.new(instance_uri + "/#{database_name}")
 
         seed_design_docs(instance_uri + "/#{database_name}", admin_credentials)
 

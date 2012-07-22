@@ -1,6 +1,6 @@
 require 'celluloid/logger'
 
-module Couchdb
+module Analysand
   module ConnectionTesting
     include Celluloid::Logger
 

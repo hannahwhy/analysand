@@ -1,6 +1,6 @@
 require 'json/ext'
 
-module Couchdb
+module Analysand
   ##
   # The response object is a wrapper around Net::HTTPResponse that provides a
   # couple of amenities:

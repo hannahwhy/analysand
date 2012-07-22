@@ -1,6 +1,6 @@
-require 'couchdb/response'
+require 'analysand/response'
 
-module Couchdb
+module Analysand
   ##
   # A subclass of Response with additional view-specific accessors: total_rows,
   # offset, and rows.

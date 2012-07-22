@@ -1,13 +1,13 @@
 require 'celluloid'
 require 'celluloid/io'
-require 'couchdb/connection_testing'
+require 'analysand/connection_testing'
 require 'http/parser'
 require 'net/http'
 require 'rack/utils'
 require 'uri'
 require 'yajl'
 
-module Couchdb
+module Analysand
   ##
   # A Celluloid::IO actor that watches the changes feed of a CouchDB database.
   # When a change is received, it passes the change to a #process method.
@@ -40,7 +40,7 @@ module Couchdb
   # Example usage
   # =============
   #
-  #     class Accumulator < Couchdb::ChangeWatcher
+  #     class Accumulator < Analysand::ChangeWatcher
   #       attr_accessor :results
   #
   #       def initialize(database)
@@ -87,7 +87,7 @@ module Couchdb
     # Checks services.  If all services pass muster, enters a read loop.
     #
     # The database parameter may be either a URL-as-string or a
-    # Couchdb::Database.
+    # Analysand::Database.
     #
     # If overriding the initializer, you MUST call super.
     def initialize(database)

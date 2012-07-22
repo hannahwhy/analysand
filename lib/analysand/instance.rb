@@ -1,16 +1,16 @@
 require 'base64'
-require 'couchdb/errors'
+require 'analysand/errors'
 require 'net/http/persistent'
 require 'uri'
 
-module Couchdb
+module Analysand
   ##
   # Wraps a CouchDB instance.
   #
   # This class is meant to be used for interacting with parts of CouchDB that
   # aren't associated with any particular database: session management, for
   # example.  If you're looking to do database operations,
-  # Couchdb::Database is where you want to be.
+  # Analysand::Database is where you want to be.
   #
   # Instances MUST be identified by an absolute URI; instantiating this class
   # with a relative URI will raise an exception.
@@ -21,7 +21,7 @@ module Couchdb
   # Opening an instance
   # -------------------
   #
-  #     instance = Couchdb::Instance(URI('http://localhost:5984'))
+  #     instance = Analysand::Instance(URI('http://localhost:5984'))
   #
   #
   # Pinging an instance
@@ -48,10 +48,10 @@ module Couchdb
   #     # => [nil, the response]
   #
   # The value in :token should be supplied as a cookie on subsequent requests,
-  # and can be passed as a credential when using Couchdb::Database
+  # and can be passed as a credential when using Analysand::Database
   # methods, e.g.
   #
-  #     db = Couchdb::Database.new(...)
+  #     db = Analysand::Database.new(...)
   #     session, resp = instance.establish_session(username, password)
   #
   #     db.put(doc, session[:token])

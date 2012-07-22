@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Couchdb
+module Analysand
   describe Response do
     let(:database_name) { "catalog_database_#{Rails.env}" }
     let(:database_uri) { instance_uri + "/#{database_name}" }

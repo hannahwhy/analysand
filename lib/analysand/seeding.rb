@@ -1,7 +1,7 @@
-require 'couchdb/database'
+require 'analysand/database'
 require 'pathname'
 
-module Couchdb
+module Analysand
   ##
   # Methods for seeding a CouchDB database.
   #
@@ -21,7 +21,7 @@ module Couchdb
   # The below examples assume that you have an object with these methods:
   #
   #     seeder = Object.new
-  #     seeder.extend Couchdb::Seeding
+  #     seeder.extend Analysand::Seeding
   #
   # Listing all seed documents for a database
   # -----------------------------------------
@@ -99,7 +99,7 @@ module Couchdb
 
     def seed(generator, database_uri, credentials, &block)
       db_name = normalize_database_name(database_uri.path.sub(%r{^/}, ''))
-      db = Couchdb::Database.new(database_uri)
+      db = Analysand::Database.new(database_uri)
 
       generator.call(db_name).map do |fn|
         doc_id = doc_id_for(fn, db_name)

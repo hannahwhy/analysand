@@ -1,10 +1,10 @@
-require 'couchdb/errors'
-require 'couchdb/response'
-require 'couchdb/view_response'
+require 'analysand/errors'
+require 'analysand/response'
+require 'analysand/view_response'
 require 'net/http/persistent'
 require 'rack/utils'
 
-module Couchdb
+module Analysand
   ##
   # A wrapper around a CouchDB database in a CouchDB instance.
   #
@@ -18,18 +18,18 @@ module Couchdb
   # Creating a database
   # -------------------
   #
-  #     vdb = Couchdb::Database.create!('http://localhost:5984/videos/',
+  #     vdb = Analysand::Database.create!('http://localhost:5984/videos/',
   #       credentials)
   #
   #  If the database was successfully created, you'll get back a
-  #  Couchdb::Database instance.  If database creation failed, a
+  #  Analysand::Database instance.  If database creation failed, a
   #  DatabaseError containing a CouchDB response will be raised.
   #
   #
   # Opening a database
   # ------------------
   #
-  #     vdb = Couchdb::Database.new('http://localhost:5984/videos/')
+  #     vdb = Analysand::Database.new('http://localhost:5984/videos/')
   #
   # The database SHOULD exist before you open it.
   #
@@ -53,7 +53,7 @@ module Couchdb
   # Dropping a database
   # -------------------
   #
-  #     Couchdb::Database.drop('http://localhost:5984/videos',
+  #     Analysand::Database.drop('http://localhost:5984/videos',
   #                                      credentials)
   #
   #     # => #<Response code=200 ...>
@@ -81,12 +81,12 @@ module Couchdb
   #                                       # => #<Response code=409 ...>
   #
   #
-  # You can also use #put!, which will raise Couchdb::DocumentNotSaved if the
+  # You can also use #put!, which will raise Analysand::DocumentNotSaved if the
   # response code is non-success.
   #
   #     begin
   #       vdb.put!(doc_id, doc, credentials)
-  #     rescue Couchdb::DocumentNotSaved => e
+  #     rescue Analysand::DocumentNotSaved => e
   #       puts "Unable to save #{doc_id}, reason: #{e.response.body}"
   #     end
   #
@@ -100,7 +100,7 @@ module Couchdb
   #                                          # => #<Response code=401 ...>
   #                                          # => #<Response code=409 ...>
   #
-  # You can also use #delete!, which will raise Couchdb::DocumentNotDeleted if
+  # You can also use #delete!, which will raise Analysand::DocumentNotDeleted if
   # the response code is non-success.
   #
   #
@@ -119,7 +119,7 @@ module Couchdb
   # If you are using forward slashes in document IDs, you MUST encode them
   # (i.e. replace / with %2F).
   #
-  # You can also use #get!, which will raise Couchdb::CannotAccessDocument if
+  # You can also use #get!, which will raise Analysand::CannotAccessDocument if
   # the response code is non-success.
   #
   #
@@ -139,7 +139,7 @@ module Couchdb
   #
   # See ViewResponse for more details.
   #
-  # You can also use view!, which will raise Couchdb::CannotAccessView on a
+  # You can also use view!, which will raise Analysand::CannotAccessView on a
   # non-success response.
   #
   #

@@ -1,4 +1,4 @@
-module Couchdb
+module Analysand
   class InvalidURIError < StandardError
   end
 

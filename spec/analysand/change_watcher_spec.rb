@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-require 'couchdb/change_watcher'
+require 'analysand/change_watcher'
 
-module Couchdb
+module Analysand
   describe ChangeWatcher do
-    class TestWatcher < Couchdb::ChangeWatcher
+    class TestWatcher < Analysand::ChangeWatcher
       attr_accessor :changes
 
       def initialize(database, credentials)
