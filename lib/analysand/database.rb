@@ -344,7 +344,7 @@ module Analysand
       Response.new(http.request(uri, req))
     end
 
-    def get_attachment(loc, credentials = nil, &block)
+    def get_attachment(loc, credentials = nil)
       uri = doc_uri(loc)
       req = Net::HTTP::Get.new(uri.to_s)
 
