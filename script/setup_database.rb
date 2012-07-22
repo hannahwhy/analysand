@@ -15,8 +15,10 @@ admin_command = ['curl',
 salt = "ff518dabd59b04b527de7c55179059a46ac54976"
 
 member_doc = {
+  "name" => member1_username,
   "salt" => salt,
   "password_sha" => Digest::SHA1.hexdigest("#{member1_password}#{salt}"),
+  "type" => "user",
   "roles" => []
 }
 
