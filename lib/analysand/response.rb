@@ -14,7 +14,10 @@ module Analysand
 
     def initialize(response)
       @response = response
-      @body = JSON.parse(@response.body) unless @response.body.empty?
+
+      if !@response.body.nil? && !@response.body.empty?
+        @body = JSON.parse(@response.body)
+      end
     end
 
     def etag

@@ -164,6 +164,20 @@ module Analysand
       end
     end
 
+    describe '#head' do
+      before do
+        clean_databases!
+
+        db.put!('foo', { 'foo' => 'bar' })
+      end
+
+      it 'retrieves the rev of a document' do
+        resp = db.head('foo')
+
+        resp.etag.should_not be_empty
+      end
+    end
+
     describe '#get!' do
       before do
         clean_databases!
