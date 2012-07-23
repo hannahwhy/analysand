@@ -4,6 +4,9 @@ Analysand - a terrible burden for a couch
 Analysand is a CouchDB client library of dubious worth.  It was extracted from
 https://github.com/amvorg-underground/catalog.
 
+Analysand was written for Ruby 1.9.  It is known to work on Ruby 1.9.3-p194 and
+Rubinius 2.0.0.
+
 Features:
 
 * GET, PUT, DELETE on databases
