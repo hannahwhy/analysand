@@ -194,6 +194,19 @@ module Analysand
   # database.
   #
   #
+  # Copying a document
+  # ------------------
+  #
+  #     vdb.copy('source', 'destination', credentials)
+  #     # => #<Response code=201 ...>
+  #     # => #<Response code=401 ...>
+  #     # => #<Response code=409 ...>
+  #
+  # To overwrite, you'll need to provide a rev of the destination document:
+  #
+  #     vdb.copy('source', "destination?rev=#{rev}", credentials)
+  #
+  #
   # Acceptable credentials
   # ======================
   #
@@ -283,6 +296,17 @@ module Analysand
       put(doc_id, doc, credentials, options).tap do |resp|
         raise ex(DocumentNotSaved, resp) unless resp.success?
       end
+    end
+
+    def copy(source, destination, credentials = nil)
+      source_uri = doc_uri(source)
+
+      req = Net::HTTP::Copy.new(source_uri.to_s)
+      req.add_field('Destination', destination)
+
+      set_credentials(req, credentials)
+
+      Response.new(http.request(source_uri, req))
     end
 
     def put_attachment(loc, io, credentials = nil, options = {})

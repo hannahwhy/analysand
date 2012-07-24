@@ -210,6 +210,25 @@ module Analysand
       end
     end
 
+    describe '#copy' do
+      before do
+        clean_databases!
+        db.put!('foo', { 'foo' => 'bar' }, admin_credentials)
+      end
+
+      it 'copies one doc to another ID' do
+        db.copy('foo', 'bar', admin_credentials)
+
+        db.get('bar').body['foo'].should == 'bar'
+      end
+
+      it 'returns success when copy succeeds' do
+        resp = db.copy('foo', 'bar', admin_credentials)
+
+        resp.should be_success
+      end
+    end
+
     describe '#put_attachment' do
       let(:io) { StringIO.new('an attachment') }
 
