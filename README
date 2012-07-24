@@ -10,7 +10,7 @@ Rubinius 2.0.0.
 Features:
 
 * GET, PUT, DELETE on databases
-* GET, PUT, DELETE, HEAD on documents
+* GET, PUT, DELETE, HEAD, COPY on documents
 * GET, PUT on document attachments
 * GET on views
 * POST /_session
