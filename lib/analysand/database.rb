@@ -1,3 +1,4 @@
+require 'analysand/bulk_response'
 require 'analysand/errors'
 require 'analysand/response'
 require 'analysand/view_response'
@@ -296,6 +297,20 @@ module Analysand
       put(doc_id, doc, credentials, options).tap do |resp|
         raise ex(DocumentNotSaved, resp) unless resp.success?
       end
+    end
+
+    def bulk_docs(docs, credentials = nil, options = {})
+      req = Net::HTTP::Post.new(doc_uri('_bulk_docs').to_s)
+
+      body = { 'docs' => docs }
+      body['all_or_nothing'] = true if options[:all_or_nothing]
+
+      set_credentials(req, credentials)
+
+      req.body = body.to_json
+      req.add_field('Content-Type', 'application/json')
+
+      BulkResponse.new(http.request(uri, req))
     end
 
     def copy(source, destination, credentials = nil)

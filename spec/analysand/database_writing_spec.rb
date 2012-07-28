@@ -163,6 +163,101 @@ module Analysand
       end
     end
 
+    describe '#bulk_docs' do
+      let(:doc1) { { '_id' => 'doc1', 'foo' => 'bar' } }
+      let(:doc2) { { '_id' => 'doc2', 'bar' => 'baz' } }
+
+      it 'creates many documents' do
+        db.bulk_docs([doc1, doc2])
+
+        db.get('doc1')['foo'].should == 'bar'
+        db.get('doc2')['bar'].should == 'baz'
+      end
+
+      it 'updates many documents' do
+        r1 = db.put!('doc1', doc1)
+        r2 = db.put!('doc2', doc2)
+
+        doc1['foo'] = 'qux'
+        doc2['bar'] = 'quux'
+        doc1['_rev'] = r1['rev']
+        doc2['_rev'] = r2['rev']
+
+        db.bulk_docs([doc1, doc2])
+
+        db.get('doc1')['foo'].should == 'qux'
+        db.get('doc2')['bar'].should == 'quux'
+      end
+
+      it 'deletes many documents' do
+        r1 = db.put!('doc1', doc1)
+        r2 = db.put!('doc2', doc2)
+
+        d1 = { '_id' => 'doc1', '_rev' => r1['rev'], '_deleted' => true }
+        d2 = { '_id' => 'doc2', '_rev' => r2['rev'], '_deleted' => true }
+
+        db.bulk_docs([d1, d2])
+
+        db.get('doc1').code.should == '404'
+        db.get('doc2').code.should == '404'
+      end
+
+      it 'updates and deletes documents' do
+        r1 = db.put!('doc1', doc1)
+        r2 = db.put!('doc2', doc2)
+
+        d1 = { '_id' => 'doc1', '_rev' => r1['rev'], '_deleted' => true }
+        d2 = { '_id' => 'doc2', '_rev' => r2['rev'], 'bar' => 'quux' }
+
+        db.bulk_docs([d1, d2])
+
+        db.get('doc1').code.should == '404'
+        db.get('doc2')['bar'].should == 'quux'
+      end
+
+      it 'returns success if all operations succeeded' do
+        resp = db.bulk_docs([doc1, doc2])
+
+        resp.should be_success
+      end
+
+      it 'returns non-success if one operation had an error' do
+        db.put!('doc1', doc1)
+
+        resp = db.bulk_docs([doc1, doc2])
+
+        resp.should_not be_success
+      end
+
+      it 'passes credentials' do
+        set_security({ 'users' => [member1_username] })
+
+        resp = db.bulk_docs([doc1, doc2], member1_credentials)
+
+        resp.should be_success
+      end
+
+      it 'operates in non-atomic mode by default' do
+        db.put!('doc1', doc1)
+        db.bulk_docs([doc1, doc2])
+
+        db.get('doc2').should be_success
+      end
+
+      it 'supports all-or-nothing mode' do
+        # Force a validation failure to check that all-or-nothing mode is
+        # properly enabled.
+        db.put!('doc1', doc1)
+        db.put!('_design/validation', {
+          'validate_doc_update' => 'function(){throw({forbidden: ""});}'
+        }, admin_credentials)
+
+        db.bulk_docs([doc1, doc2], nil, :all_or_nothing => true)
+
+        db.get('doc2').code.should == '404'
+      end
+    end
+
     describe '#copy' do
       before do
         db.put!(doc_id, doc)
