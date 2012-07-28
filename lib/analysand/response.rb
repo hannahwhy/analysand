@@ -1,16 +1,22 @@
+require 'forwardable'
 require 'json/ext'
 
 module Analysand
   ##
   # The response object is a wrapper around Net::HTTPResponse that provides a
-  # couple of amenities:
+  # few amenities:
   #
   # 1. A #success? method.  It returns true if the response code is between
   #    (200..299) and false otherwise.
   # 2. Automatic JSON deserialization of all response bodies.
+  # 3. Delegates the [] property accessor to the body.
   class Response
+    extend Forwardable
+
     attr_reader :response
     attr_reader :body
+
+    def_delegators :body, :[]
 
     def initialize(response)
       @response = response
