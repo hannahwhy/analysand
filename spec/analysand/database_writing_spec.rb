@@ -37,7 +37,7 @@ module Analysand
       it 'ignores the _id attribute in documents' do
         doc.update('_id' => 'wrong')
         put(doc_id, doc)
-        
+
         db.get(doc_id).body['foo'].should == 'bar'
         db.get('wrong').should_not be_success
       end
@@ -295,7 +295,7 @@ module Analysand
         db.copy(doc_id, 'bar', member1_credentials)
         db.get('bar')['foo'].should == 'bar'
       end
-      
+
       it 'escapes document IDs in URIs' do
         db.copy(doc_id, 'an ID')
 
@@ -338,7 +338,7 @@ module Analysand
         @put_resp = db.put!('an ID', doc)
 
         resp = db.delete('an ID', rev)
-        resp.should be_success 
+        resp.should be_success
       end
     end
 

@@ -20,7 +20,7 @@ module DatabaseAccess
       req = Net::HTTP::Put.new("/#{database_name}/_security")
       req.basic_auth(credentials[:username], credentials[:password])
       req.body = doc.to_json
-      
+
       resp = h.request(req)
 
       unless Net::HTTPSuccess === resp
@@ -28,7 +28,7 @@ module DatabaseAccess
       end
     end
   end
- 
+
   ##
   # Resets member and admin lists for the test database to [].
   def clear_security
