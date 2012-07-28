@@ -14,6 +14,7 @@ Features:
 * GET, PUT on document attachments
 * GET on views
 * POST /_session
+* POST /_bulk_docs
 * Celluloid::IO-based change feed watchers
 * Cookie and HTTP Basic authentication for all of the above
 * Database objects can be safely shared across threads
