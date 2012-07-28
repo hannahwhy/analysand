@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
+require 'analysand/database'
+require 'irb'
+require 'uri'
+
+$URI = URI('http://localhost:5984/analysand_test')
+
+
+def make_db(uri = $URI)
+  Analysand::Database.new(uri)
+end
+
+puts <<-END
+------------------------------------------------------------------------------
+Type make_db to make an Analysand::Database object.  The default URI is
+
+    #{$URI}
+
+To point at different databases, supply a URI object to make_db, e.g.
+
+    make_db(URI('https://couchdb.example.org:6984/supersekrit'))"
+------------------------------------------------------------------------------
+END
+
+IRB.start
