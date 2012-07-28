@@ -417,7 +417,7 @@ module Analysand
       uri = URI(self.uri.to_s + URI.escape(doc_id))
       uri.query = build_query(query) unless query.empty?
 
-      req = klass.new(uri.to_s)
+      req = klass.new(uri.request_uri)
 
       headers.each { |k, v| req.add_field(k, v) }
       req.body = body if body && req.request_body_permitted?
