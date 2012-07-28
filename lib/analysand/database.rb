@@ -283,14 +283,10 @@ module Analysand
     end
 
     def put(doc_id, doc, credentials = nil, options = {})
-      uri = doc_uri(doc_id)
-      uri.query = build_query(options)
-      req = Net::HTTP::Put.new(uri.to_s)
+      query = options
+      headers = { 'Content-Type' => 'application/json' }
 
-      set_credentials(req, credentials)
-      req.body = doc.to_json
-
-      Response.new(http.request(uri, req))
+      Response.new _put(doc_id, credentials, options, headers, doc.to_json)
     end
 
     def put!(doc_id, doc, credentials = nil, options = {})
@@ -300,57 +296,38 @@ module Analysand
     end
 
     def bulk_docs(docs, credentials = nil, options = {})
-      req = Net::HTTP::Post.new(doc_uri('_bulk_docs').to_s)
-
+      headers = { 'Content-Type' => 'application/json' }
       body = { 'docs' => docs }
       body['all_or_nothing'] = true if options[:all_or_nothing]
 
-      set_credentials(req, credentials)
-
-      req.body = body.to_json
-      req.add_field('Content-Type', 'application/json')
-
-      BulkResponse.new(http.request(uri, req))
+      BulkResponse.new _post('_bulk_docs', credentials, {}, headers, body.to_json)
     end
 
     def copy(source, destination, credentials = nil)
-      source_uri = doc_uri(source)
+      headers = { 'Destination' => destination }
 
-      req = Net::HTTP::Copy.new(source_uri.to_s)
-      req.add_field('Destination', destination)
-
-      set_credentials(req, credentials)
-
-      Response.new(http.request(source_uri, req))
+      Response.new _copy(source, credentials, {}, headers, nil)
     end
 
     def put_attachment(loc, io, credentials = nil, options = {})
-      uri = doc_uri(loc)
+      query = {}
+      headers = {}
 
       if options[:rev]
-        uri.query = build_query('rev' => options[:rev])
+        query['rev'] = options[:rev]
       end
-
-      req = Net::HTTP::Put.new(uri.to_s)
-      req.body = io.read
 
       if options[:content_type]
-        req.add_field('Content-Type', options[:content_type])
+        headers['Content-Type'] = options[:content_type]
       end
 
-      set_credentials(req, credentials)
-
-      Response.new(http.request(uri, req))
+      Response.new _put(loc, credentials, query, headers, io.read)
     end
 
     def delete(doc_id, rev, credentials = nil)
-      uri = doc_uri(doc_id)
-      req = Net::HTTP::Delete.new(uri.to_s)
+      headers = { 'If-Match' => rev }
 
-      set_credentials(req, credentials)
-      req.add_field('If-Match', rev)
-
-      Response.new(http.request(uri, req))
+      Response.new _delete(doc_id, credentials, {}, headers, nil)
     end
 
     def delete!(doc_id, rev, credentials = nil)
@@ -360,12 +337,7 @@ module Analysand
     end
 
     def get(doc_id, credentials = nil)
-      uri = doc_uri(doc_id)
-      req = Net::HTTP::Get.new(uri.to_s)
-
-      set_credentials(req, credentials)
-
-      Response.new(http.request(uri, req))
+      Response.new(_get(doc_id, credentials))
     end
 
     def get!(doc_id, credentials = nil)
@@ -375,26 +347,16 @@ module Analysand
     end
 
     def head(doc_id, credentials = nil)
-      uri = doc_uri(doc_id)
-      req = Net::HTTP::Head.new(uri.to_s)
-
-      set_credentials(req, credentials)
-
-      Response.new(http.request(uri, req))
+      Response.new(_head(doc_id, credentials))
     end
 
     def get_attachment(loc, credentials = nil)
-      uri = doc_uri(loc)
-      req = Net::HTTP::Get.new(uri.to_s)
-
-      set_credentials(req, credentials)
-
-      http.request(uri, req)
+      _get(loc, credentials)
     end
 
     def view(view_name, parameters = {}, credentials = nil)
       design_doc, view_name = view_name.split('/', 2)
-      uri = doc_uri("_design/#{design_doc}/_view/#{view_name}")
+      view_path = "_design/#{design_doc}/_view/#{view_name}"
 
       JSON_VALUE_PARAMETERS.each do |p|
         if parameters.has_key?(p)
@@ -402,12 +364,7 @@ module Analysand
         end
       end
 
-      uri.query = build_query(parameters)
-      req = Net::HTTP::Get.new(uri.to_s)
-
-      set_credentials(req, credentials)
-
-      ViewResponse.new(http.request(uri, req))
+      ViewResponse.new _get(view_path, credentials, parameters, {})
     end
 
     def view!(view_name, parameters = {}, credentials = nil)
@@ -444,6 +401,31 @@ module Analysand
       Response.new(http.request(uri, req))
     end
 
+    %w(Head Get Put Post Delete Copy).each do |m|
+      str = <<-END
+        def _#{m.downcase}(doc_id, credentials, query = {}, headers = {}, body = nil)
+          _req(Net::HTTP::#{m}, doc_id, credentials, query, headers, body)
+        end
+      END
+
+      class_eval str, __FILE__, __LINE__
+    end
+
+    ##
+    # @private
+    def _req(klass, doc_id, credentials, query, headers, body)
+      uri = URI(self.uri.to_s + URI.escape(doc_id))
+      uri.query = build_query(query) unless query.empty?
+
+      req = klass.new(uri.to_s)
+
+      headers.each { |k, v| req.add_field(k, v) }
+      req.body = body if body && req.request_body_permitted?
+      set_credentials(req, credentials)
+
+      http.request(uri, req)
+    end
+
     ##
     # Sets credentials on a request object.
     #
@@ -458,12 +440,6 @@ module Analysand
       elsif creds[:username] && creds[:password]
         req.basic_auth(creds[:username], creds[:password])
       end
-    end
-
-    ##
-    # @private
-    def doc_uri(doc_id)
-      URI(uri.to_s + URI.escape(doc_id))
     end
 
     ##
