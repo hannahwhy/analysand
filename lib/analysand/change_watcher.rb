@@ -71,18 +71,6 @@ module Analysand
     # Read at most this many bytes off the socket at a time.
     QUANTUM = 4096
 
-    def self.inherited(klass)
-      # Without this, a subclass of ChangeWatcher will have a
-      # Celluloid::Mailbox, not a Celluloid::IO::Mailbox.  The latter mailbox
-      # is necessary to properly integrate message handling with the reactor.
-      #
-      # For example, if a Celluloid::Mailbox is in use and the reactor is
-      # active, termination messages will not be processed.
-      #
-      # See https://github.com/celluloid/celluloid-io/issues/22.
-      klass.send(:include, Celluloid::IO)
-    end
-
     ##
     # Checks services.  If all services pass muster, enters a read loop.
     #
