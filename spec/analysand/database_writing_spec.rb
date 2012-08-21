@@ -82,6 +82,34 @@ module Analysand
       end
     end
 
+    describe '#create' do
+      before do
+        drop_databases!
+      end
+
+      it 'creates a database' do
+        db.create(admin_credentials)
+
+        db.ping.should be_success
+      end
+
+      it 'returns success' do
+        db.create(admin_credentials).should be_success
+      end
+    end
+
+    describe '#drop' do
+      it 'drops the database' do
+        db.drop(admin_credentials)
+
+        db.ping.should_not be_success
+      end
+
+      it 'returns success' do
+        db.drop(admin_credentials).should be_success
+      end
+    end
+
     describe '#put' do
       it_should_behave_like '#put success examples' do
         let(:method) { :put }

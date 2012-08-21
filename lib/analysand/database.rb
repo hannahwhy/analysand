@@ -26,13 +26,16 @@ module Analysand
   #  Analysand::Database instance.  If database creation failed, a
   #  DatabaseError containing a CouchDB response will be raised.
   #
+  #  You can also instantiate a database and then create it:
+  #
+  #     vdb = Analysand::Database.new('http://localhost:5984/videos')
+  #     vdb.create(credentials)  # => #<Response ...>
+  #
   #
   # Opening a database
   # ------------------
   #
   #     vdb = Analysand::Database.new('http://localhost:5984/videos/')
-  #
-  # The database SHOULD exist before you open it.
   #
   #
   # Closing connections
@@ -61,6 +64,10 @@ module Analysand
   #     # => #<Response code=401 ...>
   #     # => #<Response code=404 ...>
   #
+  #  You can also instantiate a database and then drop it:
+  #
+  #     db = Analysand::Database.new('http://localhost:5984/videos')
+  #     db.drop   # => #<Response ...>
   #
   # Creating a document
   # -------------------
@@ -373,28 +380,20 @@ module Analysand
       end
     end
 
-    ##
-    # While you can use this, you shouldn't.  Use the class-level create
-    # instead.
-    #
-    # @private
-    def create!(credentials)
+    def create(credentials = nil)
       req = Net::HTTP::Put.new(uri.to_s)
       set_credentials(req, credentials)
 
-      Response.new(http.request(uri, req)).tap do |resp|
-        if !resp.success?
-          raise DatabaseError, "Database #{uri} could not be created (response code: #{resp.code})"
-        end
+      Response.new(http.request(uri, req))
+    end
+
+    def create!(credentials = nil)
+      create(credentials).tap do |resp|
+        raise ex(DatabaseError, resp) unless resp.success?
       end
     end
 
-    ##
-    # While you can use this, you shouldn't.  Use the class-level drop
-    # instead.
-    #
-    # @private
-    def drop(credentials)
+    def drop(credentials = nil)
       req = Net::HTTP::Delete.new(uri.to_s)
       set_credentials(req, credentials)
 

@@ -3,6 +3,7 @@ module Analysand
   end
 
   class DatabaseError < StandardError
+    attr_accessor :response
   end
 
   class DocumentNotSaved < StandardError
