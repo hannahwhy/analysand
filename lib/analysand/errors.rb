@@ -6,23 +6,18 @@ module Analysand
     attr_accessor :response
   end
 
-  class DocumentNotSaved < StandardError
-    attr_accessor :response
+  class DocumentNotSaved < DatabaseError
   end
 
-  class DocumentNotDeleted < StandardError
-    attr_accessor :response
+  class DocumentNotDeleted < DatabaseError
   end
 
-  class CannotAccessDocument < StandardError
-    attr_accessor :response
+  class CannotAccessDocument < DatabaseError
   end
 
-  class CannotAccessView < StandardError
-    attr_accessor :response
+  class CannotAccessView < DatabaseError
   end
 
-  class CannotDropDatabase < StandardError
-    attr_accessor :response
+  class CannotDropDatabase < DatabaseError
   end
 end
