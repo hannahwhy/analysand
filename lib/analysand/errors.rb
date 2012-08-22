@@ -21,4 +21,8 @@ module Analysand
   class CannotAccessView < StandardError
     attr_accessor :response
   end
+
+  class CannotDropDatabase < StandardError
+    attr_accessor :response
+  end
 end

@@ -32,6 +32,25 @@ module Analysand
   #     vdb.create(credentials)  # => #<Response ...>
   #
   #
+  # Dropping a database
+  # -------------------
+  #
+  #     Analysand::Database.drop('http://localhost:5984/videos',
+  #                                      credentials)
+  #
+  #     # => #<Response code=200 ...>
+  #     # => #<Response code=401 ...>
+  #     # => #<Response code=404 ...>
+  #
+  #  You can also instantiate a database and then drop it:
+  #
+  #     db = Analysand::Database.new('http://localhost:5984/videos')
+  #     db.drop   # => #<Response ...>
+  #
+  #  You can also use #drop!, which will raise Analysand::CannotDropDatabase
+  #  on a non-success response.
+  #
+  #
   # Opening a database
   # ------------------
   #
@@ -53,21 +72,6 @@ module Analysand
   # After close returns, you can re-open a connection by calling #get, #put,
   # etc.
   #
-  #
-  # Dropping a database
-  # -------------------
-  #
-  #     Analysand::Database.drop('http://localhost:5984/videos',
-  #                                      credentials)
-  #
-  #     # => #<Response code=200 ...>
-  #     # => #<Response code=401 ...>
-  #     # => #<Response code=404 ...>
-  #
-  #  You can also instantiate a database and then drop it:
-  #
-  #     db = Analysand::Database.new('http://localhost:5984/videos')
-  #     db.drop   # => #<Response ...>
   #
   # Creating a document
   # -------------------
@@ -398,6 +402,12 @@ module Analysand
       set_credentials(req, credentials)
 
       Response.new(http.request(uri, req))
+    end
+
+    def drop!(credentials = nil)
+      drop(credentials).tap do |resp|
+        raise ex(CannotDropDatabase, resp) unless resp.success?
+      end
     end
 
     %w(Head Get Put Post Delete Copy).each do |m|

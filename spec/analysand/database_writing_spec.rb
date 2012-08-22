@@ -110,6 +110,18 @@ module Analysand
       end
     end
 
+    describe '#drop!' do
+      it 'drops the database' do
+        db.drop(admin_credentials)
+
+        db.ping.should_not be_success
+      end
+
+      it 'raises Analysand::CannotDropDatabase on failure' do
+        lambda { db.drop!(member1_credentials) }.should raise_error(Analysand::CannotDropDatabase)
+      end
+    end
+
     describe '#put' do
       it_should_behave_like '#put success examples' do
         let(:method) { :put }
