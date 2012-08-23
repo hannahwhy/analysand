@@ -20,4 +20,7 @@ module Analysand
 
   class CannotDropDatabase < DatabaseError
   end
+
+  class BulkOperationFailed < DatabaseError
+  end
 end

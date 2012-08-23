@@ -314,6 +314,12 @@ module Analysand
       BulkResponse.new _post('_bulk_docs', credentials, {}, headers, body.to_json)
     end
 
+    def bulk_docs!(docs, credentials = nil, options = {})
+      bulk_docs(docs, credentials, options).tap do |resp|
+        raise ex(BulkOperationFailed, resp) unless resp.success?
+      end
+    end
+
     def copy(source, destination, credentials = nil)
       headers = { 'Destination' => destination }
 

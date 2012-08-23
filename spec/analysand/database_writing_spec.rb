@@ -298,6 +298,27 @@ module Analysand
       end
     end
 
+    describe '#bulk_docs!' do
+      let(:doc1) { { '_id' => 'doc1', 'foo' => 'bar' } }
+      let(:doc2) { { '_id' => 'doc2', 'bar' => 'baz' } }
+
+      it 'returns success if all operations succeeded' do
+        resp = db.bulk_docs!([doc1, doc2])
+
+        resp.should be_success
+      end
+
+      describe 'if an operation fails' do
+        before do
+          doc2['_id'] = 'doc1'
+        end
+
+        it 'raises Analysand::BulkOperationFailed' do
+          lambda { db.bulk_docs!([doc1, doc2]) }.should raise_error(Analysand::BulkOperationFailed)
+        end
+      end
+    end
+
     describe '#copy' do
       before do
         db.put!(doc_id, doc)
