@@ -371,9 +371,12 @@ module Analysand
       _get(loc, credentials)
     end
 
+    def all_docs(parameters = {}, credentials = nil)
+      view('_all_docs', parameters, credentials)
+    end
+
     def view(view_name, parameters = {}, credentials = nil)
-      design_doc, view_name = view_name.split('/', 2)
-      view_path = "_design/#{design_doc}/_view/#{view_name}"
+      view_path = expand_view_path(view_name)
 
       JSON_VALUE_PARAMETERS.each do |p|
         if parameters.has_key?(p)
@@ -382,6 +385,15 @@ module Analysand
       end
 
       ViewResponse.new _get(view_path, credentials, parameters, {})
+    end
+
+    def expand_view_path(view_name)
+      if view_name.include?('/')
+        design_doc, view_name = view_name.split('/', 2)
+        "_design/#{design_doc}/_view/#{view_name}"
+      else
+        view_name
+      end
     end
 
     def view!(view_name, parameters = {}, credentials = nil)

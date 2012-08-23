@@ -135,6 +135,12 @@ module Analysand
         db.put('abc456', {}, admin_credentials)
       end
 
+      it 'retrieves _all_docs' do
+        resp = db.view('_all_docs')
+
+        resp.code.should == '200'
+      end
+
       it 'retrieves a view' do
         resp = db.view('doc/a_view')
 
