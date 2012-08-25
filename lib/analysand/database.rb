@@ -375,6 +375,10 @@ module Analysand
       view('_all_docs', parameters, credentials)
     end
 
+    def all_docs!(parameters = {}, credentials = nil)
+      view!('_all_docs', parameters, credentials)
+    end
+
     def view(view_name, parameters = {}, credentials = nil)
       view_path = expand_view_path(view_name)
 
