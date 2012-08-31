@@ -93,6 +93,9 @@ module Analysand
     def initialize(database)
       @db = database
       @waiting = {}
+      @http_parser = Http::Parser.new(self)
+      @json_parser = Yajl::Parser.new
+      @json_parser.on_parse_complete = lambda { |doc| process(doc) }
 
       start!
     end
@@ -151,7 +154,6 @@ module Analysand
         sleep 30
       end
 
-      prepare
       connect
 
       info "#{self.class} entering read loop"
@@ -253,14 +255,6 @@ module Analysand
     # @private
     def on_body(chunk)
       @json_parser << chunk
-    end
-
-    ##
-    # @private
-    def prepare
-      @http_parser = Http::Parser.new(self)
-      @json_parser = Yajl::Parser.new
-      @json_parser.on_parse_complete = lambda { |doc| process(doc) }
     end
 
     ##
