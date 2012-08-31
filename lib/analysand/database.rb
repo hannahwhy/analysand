@@ -445,7 +445,7 @@ module Analysand
     ##
     # @private
     def _req(klass, doc_id, credentials, query, headers, body)
-      uri = URI(self.uri.to_s + URI.escape(doc_id))
+      uri = self.uri + URI.escape(doc_id)
       uri.query = build_query(query) unless query.empty?
 
       req = klass.new(uri.request_uri)
