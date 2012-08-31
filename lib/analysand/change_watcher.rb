@@ -265,7 +265,6 @@ module Analysand
       info "#{self.class} connecting to #{req.path}"
 
       @socket = TCPSocket.new(uri.host, uri.port)
-      @socket.wait_writable
 
       # Make the request.
       data = [
