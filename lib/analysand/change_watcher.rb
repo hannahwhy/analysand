@@ -161,8 +161,7 @@ module Analysand
       @running = true
 
       while @running
-        @socket.wait_readable
-        @http_parser << @socket.read_nonblock(QUANTUM)
+        @http_parser << @socket.readpartial(QUANTUM)
       end
 
       # Once we're done, close things up.
