@@ -80,6 +80,12 @@ module Analysand
 
         db.get('an ID').should be_success
       end
+
+      it 'handles URN-like IDs' do
+        db.put('org.couchdb.doc:one', doc)
+
+        db.get('org.couchdb.doc:one').should be_success
+      end
     end
 
     describe '#create' do
