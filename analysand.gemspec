@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Analysand::VERSION
 
-  gem.add_dependency 'celluloid'
+  gem.add_dependency 'celluloid', '>= 0.12'
   gem.add_dependency 'celluloid-io'
   gem.add_dependency 'http_parser.rb'
   gem.add_dependency 'json'
