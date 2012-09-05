@@ -85,7 +85,7 @@ module Analysand
       @json_parser = Yajl::Parser.new
       @json_parser.on_parse_complete = lambda { |doc| process(doc) }
 
-      start!
+      async.start
     end
 
     # The URI of the changes feed.  This URI incorporates any changes
