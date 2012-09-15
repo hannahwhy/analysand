@@ -170,6 +170,26 @@ module Analysand
       end
     end
 
+    describe '#ensure_full_commit' do
+      before do
+        db.put('abc', {}, :batch => :ok)
+      end
+
+      it 'flushes batched PUTs' do
+        db.ensure_full_commit
+
+        db.get('abc').should be_success
+      end
+
+      it 'accepts credentials' do
+        lambda { db.ensure_full_commit(member1_credentials) }.should_not raise_error(ArgumentError)
+      end
+
+      it 'accepts a seq parameter' do
+        lambda { db.ensure_full_commit(member1_credentials, :seq => 10) }.should_not raise_error(ArgumentError)
+      end
+    end
+
     describe '#put_attachment' do
       let(:string) { 'an attachment' }
       let(:io) { StringIO.new(string) }
