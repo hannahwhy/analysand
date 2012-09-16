@@ -175,6 +175,10 @@ module Analysand
         db.put('abc', {}, :batch => :ok)
       end
 
+      it 'returns success' do
+        db.ensure_full_commit.should be_success
+      end
+
       it 'flushes batched PUTs' do
         db.ensure_full_commit
 
