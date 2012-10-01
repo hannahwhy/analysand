@@ -4,3 +4,5 @@ rvm:
   - 1.9.3
 before_script:
   - "./script/setup_database.rb"
+services:
+  - couchdb

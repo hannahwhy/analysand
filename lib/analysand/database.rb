@@ -306,6 +306,12 @@ module Analysand
       end
     end
 
+    def ensure_full_commit(credentials = nil, options = {})
+      headers = { 'Content-Type' => 'application/json' }
+
+      Response.new _post('_ensure_full_commit', credentials, options, headers, {}.to_json)
+    end
+
     def bulk_docs(docs, credentials = nil, options = {})
       headers = { 'Content-Type' => 'application/json' }
       body = { 'docs' => docs }
