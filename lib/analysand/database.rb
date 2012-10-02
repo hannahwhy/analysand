@@ -141,6 +141,12 @@ module Analysand
   #     vdb.view('video/recent', :key => ['member1'])
   #     vdb.view('video/by_artist', :startkey => 'a', :endkey => 'b')
   #
+  #
+  # If you're running into problems with large key sets generating very long
+  # query strings, you can use POST mode (CouchDB) 0.9+):
+  #
+  #     vdb.view('video/by_artist', :keys => many_keys, :post => true)
+  #
   # Keys are automatically JSON-encoded.  The view method returns a
   # ViewResponse, which may be accessed like this:
   #
@@ -295,9 +301,8 @@ module Analysand
 
     def put(doc_id, doc, credentials = nil, options = {})
       query = options
-      headers = { 'Content-Type' => 'application/json' }
 
-      Response.new _put(doc_id, credentials, options, headers, doc.to_json)
+      Response.new _put(doc_id, credentials, options, json_headers, doc.to_json)
     end
 
     def put!(doc_id, doc, credentials = nil, options = {})
@@ -307,17 +312,14 @@ module Analysand
     end
 
     def ensure_full_commit(credentials = nil, options = {})
-      headers = { 'Content-Type' => 'application/json' }
-
-      Response.new _post('_ensure_full_commit', credentials, options, headers, {}.to_json)
+      Response.new _post('_ensure_full_commit', credentials, options, json_headers, {}.to_json)
     end
 
     def bulk_docs(docs, credentials = nil, options = {})
-      headers = { 'Content-Type' => 'application/json' }
       body = { 'docs' => docs }
       body['all_or_nothing'] = true if options[:all_or_nothing]
 
-      BulkResponse.new _post('_bulk_docs', credentials, {}, headers, body.to_json)
+      BulkResponse.new _post('_bulk_docs', credentials, {}, json_headers, body.to_json)
     end
 
     def bulk_docs!(docs, credentials = nil, options = {})
@@ -386,15 +388,39 @@ module Analysand
     end
 
     def view(view_name, parameters = {}, credentials = nil)
+      use_post = parameters.delete(:post)
       view_path = expand_view_path(view_name)
 
+      resp = if use_post
+               post_view(view_path, parameters, credentials)
+             else
+               get_view(view_path, parameters, credentials)
+             end
+
+      ViewResponse.new resp
+    end
+
+    def get_view(view_path, parameters, credentials)
+      encode_parameters(parameters)
+      _get(view_path, credentials, parameters, {})
+    end
+
+    def post_view(view_path, parameters, credentials)
+      body = {
+        'keys' => parameters.delete(:keys)
+      }.reject { |_, v| v.nil? }
+
+      encode_parameters(parameters)
+
+      _post(view_path, credentials, parameters, json_headers, body.to_json)
+    end
+
+    def encode_parameters(parameters)
       JSON_VALUE_PARAMETERS.each do |p|
         if parameters.has_key?(p)
           parameters[p] = parameters[p].to_json
         end
       end
-
-      ViewResponse.new _get(view_path, credentials, parameters, {})
     end
 
     def expand_view_path(view_name)
@@ -477,6 +503,10 @@ module Analysand
       elsif creds[:username] && creds[:password]
         req.basic_auth(creds[:username], creds[:password])
       end
+    end
+
+    def json_headers
+      { 'Content-Type' => 'application/json' }
     end
 
     ##

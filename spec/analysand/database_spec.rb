@@ -185,6 +185,13 @@ module Analysand
         resp.rows.length.should == 1
       end
 
+      it 'can issue POSTs' do
+        resp = db.view('doc/a_view', :keys => ['abc123', 'abc456'], :post => true)
+
+        resp.code.should == '200'
+        resp.rows.length.should == 2
+      end
+
       it 'passes credentials' do
         security = {
           'members' => {

@@ -12,7 +12,7 @@ Features:
 * GET, PUT, DELETE on databases
 * GET, PUT, DELETE, HEAD, COPY on documents
 * GET, PUT on document attachments
-* GET on views
+* GET, POST on views
 * POST /_session
 * POST /_bulk_docs
 * Celluloid::IO-based change feed watchers
