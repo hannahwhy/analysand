@@ -15,6 +15,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Analysand::VERSION
 
+  gem.required_ruby_version = '>= 1.9'
+
   gem.add_dependency 'celluloid', '>= 0.12'
   gem.add_dependency 'celluloid-io'
   gem.add_dependency 'http_parser.rb'
