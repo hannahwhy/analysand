@@ -143,7 +143,7 @@ module Analysand
   #
   #
   # If you're running into problems with large key sets generating very long
-  # query strings, you can use POST mode (CouchDB) 0.9+):
+  # query strings, you can use POST mode (CouchDB 0.9+):
   #
   #     vdb.view('video/by_artist', :keys => many_keys, :post => true)
   #
