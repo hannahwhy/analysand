@@ -274,7 +274,7 @@ module Analysand
     def initialize(uri)
       raise InvalidURIError, 'You must supply an absolute URI' unless uri.absolute?
 
-      @http = Net::HTTP::Persistent.new('catalog_database')
+      @http = Net::HTTP::Persistent.new('analysand_database')
       @uri = uri
 
       # URI.join (used to calculate a document URI) will replace the database
