@@ -1,7 +1,9 @@
 require 'analysand/bulk_response'
 require 'analysand/errors'
 require 'analysand/response'
+require 'analysand/streaming_view_response'
 require 'analysand/view_response'
+require 'fiber'
 require 'net/http/persistent'
 require 'rack/utils'
 
@@ -141,21 +143,26 @@ module Analysand
   #     vdb.view('video/recent', :key => ['member1'])
   #     vdb.view('video/by_artist', :startkey => 'a', :endkey => 'b')
   #
+  # Keys are automatically JSON-encoded, as required by CouchDB.
   #
   # If you're running into problems with large key sets generating very long
   # query strings, you can use POST mode (CouchDB 0.9+):
   #
   #     vdb.view('video/by_artist', :keys => many_keys, :post => true)
   #
-  # Keys are automatically JSON-encoded.  The view method returns a
-  # ViewResponse, which may be accessed like this:
+  # If you're reading many records from a view, you may want to stream them
+  # in:
+  #
+  #     vdb.view('video/all', :stream => true)
+  #
+  # View data and metadata may be accessed as follows:
   #
   #     resp = vdb.view('video/recent', :limit => 10)
   #     resp.total_rows   # => 16
   #     resp.offset       # => 0
-  #     resp.rows         # => [ { 'id' => ... }, ... } ]
+  #     resp.rows         # => an Enumerable
   #
-  # See ViewResponse for more details.
+  # See ViewResponse and StreamingViewResponse for more details.
   #
   # You can also use view!, which will raise Analysand::CannotAccessView on a
   # non-success response.
@@ -388,31 +395,54 @@ module Analysand
     end
 
     def view(view_name, parameters = {}, credentials = nil)
-      use_post = parameters.delete(:post)
+      stream = parameters.delete(:stream)
       view_path = expand_view_path(view_name)
 
-      resp = if use_post
-               post_view(view_path, parameters, credentials)
-             else
-               get_view(view_path, parameters, credentials)
-             end
+      if stream
+        stream_view(view_path, parameters, credentials)
+      else
+        return_view(view_path, parameters, credentials)
+      end
+    end
+
+    def stream_view(view_path, parameters, credentials)
+      StreamingViewResponse.new do |sresp|
+        do_view_query(view_path, parameters, credentials) do |resp|
+          sresp.http_response = resp
+          resp.read_body { |data| Fiber.yield(data) }
+        end
+      end
+    end
+
+    def return_view(view_path, parameters, credentials)
+      resp = do_view_query(view_path, parameters, credentials)
 
       ViewResponse.new resp
     end
 
-    def get_view(view_path, parameters, credentials)
-      encode_parameters(parameters)
-      _get(view_path, credentials, parameters, {})
+    def do_view_query(view_path, parameters, credentials, &block)
+      use_post = parameters.delete(:post)
+
+      if use_post
+        post_view(view_path, parameters, credentials, block)
+      else
+        get_view(view_path, parameters, credentials, block)
+      end
     end
 
-    def post_view(view_path, parameters, credentials)
+    def get_view(view_path, parameters, credentials, block)
+      encode_parameters(parameters)
+      _get(view_path, credentials, parameters, {}, nil, block)
+    end
+
+    def post_view(view_path, parameters, credentials, block)
       body = {
         'keys' => parameters.delete(:keys)
       }.reject { |_, v| v.nil? }
 
       encode_parameters(parameters)
 
-      _post(view_path, credentials, parameters, json_headers, body.to_json)
+      _post(view_path, credentials, parameters, json_headers, body.to_json, block)
     end
 
     def encode_parameters(parameters)
@@ -466,8 +496,8 @@ module Analysand
 
     %w(Head Get Put Post Delete Copy).each do |m|
       str = <<-END
-        def _#{m.downcase}(doc_id, credentials, query = {}, headers = {}, body = nil)
-          _req(Net::HTTP::#{m}, doc_id, credentials, query, headers, body)
+        def _#{m.downcase}(doc_id, credentials, query = {}, headers = {}, body = nil, block = nil)
+          _req(Net::HTTP::#{m}, doc_id, credentials, query, headers, body, block)
         end
       END
 
@@ -476,7 +506,7 @@ module Analysand
 
     ##
     # @private
-    def _req(klass, doc_id, credentials, query, headers, body)
+    def _req(klass, doc_id, credentials, query, headers, body, block)
       uri = URI(self.uri.to_s + URI.escape(doc_id))
       uri.query = build_query(query) unless query.empty?
 
@@ -486,7 +516,7 @@ module Analysand
       req.body = body if body && req.request_body_permitted?
       set_credentials(req, credentials)
 
-      http.request(uri, req)
+      http.request(uri, req, &block)
     end
 
     ##

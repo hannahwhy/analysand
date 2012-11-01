@@ -23,4 +23,7 @@ module Analysand
 
   class BulkOperationFailed < DatabaseError
   end
+
+  class UnexpectedViewKey < StandardError
+  end
 end

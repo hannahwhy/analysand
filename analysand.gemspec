@@ -21,6 +21,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'celluloid-io'
   gem.add_dependency 'http_parser.rb'
   gem.add_dependency 'json'
+  gem.add_dependency 'json-stream'
   gem.add_dependency 'net-http-persistent'
   gem.add_dependency 'rack'
   gem.add_dependency 'yajl-ruby'

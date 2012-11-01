@@ -19,7 +19,7 @@ module Analysand
                 var i;
 
                 for(i = 0; i < #{doc_count}; i++) {
-                  emit(doc['_id'], 1);
+                  emit(doc['_id'], i);
                 }
               }
             }
@@ -56,6 +56,14 @@ module Analysand
 
         resp.total_rows.should == doc_count
         resp.offset.should == 0
+      end
+
+      describe '#each' do
+        it 'returns an Enumerator if no block is given' do
+          resp = db.view('doc/a_view', :stream => true)
+
+          resp.rows.each.should be_instance_of(Enumerator)
+        end
       end
     end
   end
