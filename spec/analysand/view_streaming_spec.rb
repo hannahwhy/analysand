@@ -37,6 +37,12 @@ module Analysand
     end
 
     describe '#view in streaming mode' do
+      let(:resp) { db.view('doc/a_view', :stream => true) }
+
+      it 'returns all rows' do
+        resp.rows.map { 1 }.inject(&:+).should == row_count
+      end
+
       it 'returns rows as soon as possible' do
         streamed = Benchmark.realtime do
           resp = db.view('doc/a_view', :stream => true)
