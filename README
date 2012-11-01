@@ -15,6 +15,7 @@ Features:
 * GET, POST on views
 * POST /_session
 * POST /_bulk_docs
+* View streaming
 * Celluloid::IO-based change feed watchers
 * Cookie and HTTP Basic authentication for all of the above
 * Database objects can be safely shared across threads
