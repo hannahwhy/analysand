@@ -1,18 +1,29 @@
 require 'spec_helper'
 
+require 'analysand/database'
 require 'analysand/view_response'
+
+require File.expand_path('../a_response', __FILE__)
 
 module Analysand
   describe ViewResponse do
+    let(:resp_with_docs) do
+      '{"rows": [{"id":"foo","key":"foo","value":{},"doc":{"foo":"bar"}}]}'
+    end
+
+    let(:resp_without_docs) do
+      '{"rows": [{"id":"foo","key":"foo","value":{}}]}'
+    end
+
+    let(:db) { Database.new(database_uri) }
+
+    it_should_behave_like 'a response' do
+      let(:response) do
+        VCR.use_cassette('view') { db.view('doc/a_view') }
+      end
+    end
+
     describe '#docs' do
-      let(:resp_with_docs) do
-        '{"rows": [{"id":"foo","key":"foo","value":{},"doc":{"foo":"bar"}}]}'
-      end
-
-      let(:resp_without_docs) do
-        '{"rows": [{"id":"foo","key":"foo","value":{}}]}'
-      end
-
       describe 'if the view includes docs' do
         subject { ViewResponse.new(stub(:body => resp_with_docs)) }
 
