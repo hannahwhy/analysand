@@ -293,10 +293,7 @@ module Analysand
     end
 
     def ping(credentials = nil)
-      req = Net::HTTP::Get.new(uri.to_s)
-      set_credentials(req, credentials)
-
-      Response.new(http.request(uri, req))
+      Response.new _get('', credentials)
     end
 
     def status(credentials = nil)
@@ -308,10 +305,7 @@ module Analysand
     end
 
     def create(credentials = nil)
-      req = Net::HTTP::Put.new(uri.to_s)
-      set_credentials(req, credentials)
-
-      Response.new(http.request(uri, req))
+      Response.new _put('', credentials)
     end
 
     def create!(credentials = nil)
@@ -321,10 +315,7 @@ module Analysand
     end
 
     def drop(credentials = nil)
-      req = Net::HTTP::Delete.new(uri.to_s)
-      set_credentials(req, credentials)
-
-      Response.new(http.request(uri, req))
+      Response.new _delete('', credentials)
     end
 
     def drop!(credentials = nil)
