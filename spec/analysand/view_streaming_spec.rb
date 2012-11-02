@@ -6,7 +6,7 @@ require 'benchmark'
 module Analysand
   describe Database do
     let(:db) { Database.new(database_uri) }
-    let(:row_count) { 10000 }
+    let(:row_count) { 5000 }
 
     before(:all) do
       clean_databases!
