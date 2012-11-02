@@ -285,8 +285,8 @@ module Analysand
       @http = Net::HTTP::Persistent.new('analysand_database')
       @uri = uri
 
-      # URI.join (used to calculate a document URI) will replace the database
-      # name unless we make it clear that the database is part of the path
+      # Document IDs and other database bits are appended to the URI path,
+      # so we need to make sure that it ends in a /.
       unless uri.path.end_with?('/')
         uri.path += '/'
       end
@@ -337,7 +337,8 @@ module Analysand
     ##
     # @private
     def _req(klass, doc_id, credentials, query, headers, body, block)
-      uri = URI(self.uri.to_s + URI.escape(doc_id))
+      uri = self.uri.dup
+      uri.path += URI.escape(doc_id)
       uri.query = build_query(query) unless query.empty?
 
       req = klass.new(uri.request_uri)
