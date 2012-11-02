@@ -39,8 +39,8 @@ module Analysand
     describe '#view in streaming mode' do
       let(:resp) { db.view('doc/a_view', :stream => true) }
 
-      it 'returns all rows' do
-        resp.rows.map { 1 }.inject(&:+).should == row_count
+      it 'returns all rows in order' do
+        resp.rows.map { |r| r['value'] }.should == (0...row_count).to_a
       end
 
       it 'returns rows as soon as possible' do

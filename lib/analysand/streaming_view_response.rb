@@ -51,7 +51,7 @@ module Analysand
         read while @reader.alive? && @generator.staged_rows.empty?
 
         until @generator.staged_rows.empty?
-          yield @generator.staged_rows.pop
+          yield @generator.staged_rows.shift
         end
       end
     end
