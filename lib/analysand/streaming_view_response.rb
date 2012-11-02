@@ -2,7 +2,7 @@ require 'analysand/view_streaming/builder'
 require 'fiber'
 
 module Analysand
-  # Private: Controls streaming of view data.
+  # Public: Controls streaming of view data.
   #
   # This class is meant to be used by Analysand::Database#view.  It exports the
   # same interface as ViewResponse.
