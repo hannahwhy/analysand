@@ -51,6 +51,12 @@ module Analysand
         resp.rows.map { |r| r['value'] }.should == (0...row_count).to_a
       end
 
+      it 'returns error codes from failures' do
+        resp = db.view('doc/nonexistent', :stream => true)
+
+        resp.code.should == '404'
+      end
+
       it 'returns rows as soon as possible' do
         streamed = Benchmark.realtime do
           resp = db.view('doc/a_view', :stream => true)
