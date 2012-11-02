@@ -24,7 +24,7 @@ module Analysand
     attr_accessor :http_response
 
     def initialize
-      @reader = Fiber.new { yield self }
+      @reader = Fiber.new { yield self; "" }
       @generator = ViewStreaming::Builder.new
     end
 
