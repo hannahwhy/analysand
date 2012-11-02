@@ -6,7 +6,7 @@ require 'benchmark'
 module Analysand
   describe Database do
     let(:db) { Database.new(database_uri) }
-    let(:doc_count) { 10000 }
+    let(:row_count) { 10000 }
 
     before(:all) do
       clean_databases!
@@ -18,7 +18,7 @@ module Analysand
               function (doc) {
                 var i;
 
-                for(i = 0; i < #{doc_count}; i++) {
+                for(i = 0; i < #{row_count}; i++) {
                   emit(doc['_id'], i);
                 }
               }
@@ -60,7 +60,7 @@ module Analysand
       it 'returns view metadata' do
         resp = db.view('doc/a_view', :stream => true)
 
-        resp.total_rows.should == doc_count
+        resp.total_rows.should == row_count
         resp.offset.should == 0
       end
 
