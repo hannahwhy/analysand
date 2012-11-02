@@ -26,6 +26,27 @@ module Analysand
     def initialize
       @reader = Fiber.new { yield self; "" }
       @generator = ViewStreaming::Builder.new
+
+      # Analysand::Database#stream_view issues the request.  When the response
+      # arrives, it yields control back here.  Subsequent resumes read the
+      # body.
+      #
+      # We do this to provide the response headers as soon as possible.
+      @reader.resume
+    end
+
+    def etag
+      http_response.get_fields('ETag').first.gsub('"', '')
+    end
+
+    def code
+      http_response.code
+    end
+
+    def success?
+      c = code.to_i
+
+      c >= 200 && c <= 299
     end
 
     def total_rows

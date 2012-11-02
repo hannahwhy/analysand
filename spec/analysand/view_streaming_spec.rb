@@ -3,6 +3,8 @@ require 'spec_helper'
 require 'analysand/database'
 require 'benchmark'
 
+require File.expand_path('../a_response', __FILE__)
+
 module Analysand
   describe Database do
     let(:db) { Database.new(database_uri) }
@@ -34,6 +36,12 @@ module Analysand
     before do
       # make sure the view's built
       db.head('_design/doc/_view/a_view', admin_credentials)
+    end
+
+    describe 'the streaming view response' do
+      it_should_behave_like 'a response' do
+        let(:response) { db.view('doc/a_view', :stream => true) }
+      end
     end
 
     describe '#view in streaming mode' do

@@ -409,6 +409,7 @@ module Analysand
       StreamingViewResponse.new do |sresp|
         do_view_query(view_path, parameters, credentials) do |resp|
           sresp.http_response = resp
+          Fiber.yield
           resp.read_body { |data| Fiber.yield(data) }
         end
       end
