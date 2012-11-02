@@ -40,10 +40,6 @@ module Analysand
       @generator.offset
     end
 
-    def eof?
-      !@reader.alive?
-    end
-
     def read
       @generator << @reader.resume
     end
@@ -51,8 +47,8 @@ module Analysand
     def each
       return to_enum unless block_given?
 
-      until eof?
-        read while @generator.staged_rows.empty?
+      while @reader.alive?
+        read while @reader.alive? && @generator.staged_rows.empty?
 
         until @generator.staged_rows.empty?
           yield @generator.staged_rows.pop
