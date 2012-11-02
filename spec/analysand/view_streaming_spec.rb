@@ -51,6 +51,12 @@ module Analysand
         resp.rows.map { |r| r['value'] }.should == (0...row_count).to_a
       end
 
+      it 'yields docs' do
+        resp = db.view('doc/a_view', :stream => true, :include_docs => true)
+
+        resp.docs.take(10).all? { |d| d.has_key?('_id') }.should be_true
+      end
+
       it 'returns error codes from failures' do
         resp = db.view('doc/nonexistent', :stream => true)
 

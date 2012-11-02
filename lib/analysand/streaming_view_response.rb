@@ -39,6 +39,22 @@ module Analysand
       http_response.get_fields('ETag').first.gsub('"', '')
     end
 
+    # Public: Yields documents in the view stream.
+    #
+    # Note that #docs and #rows advance the same stream, so expect to miss half
+    # your rows if you do something like
+    #
+    #     resp.docs.zip(resp.rows)
+    #
+    # If this is a problem for you, let me know and we can work out a solution.
+    def docs
+      to_enum(:get_docs)
+    end
+
+    def get_docs
+      each { |r| yield r['doc'] if r.has_key?('doc') }
+    end
+
     def code
       http_response.code
     end
