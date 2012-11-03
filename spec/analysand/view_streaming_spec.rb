@@ -11,6 +11,14 @@ module Analysand
     let(:row_count) { 10000 }
 
     before(:all) do
+      WebMock.disable!
+    end
+
+    after(:all) do
+      WebMock.enable!
+    end
+
+    before(:all) do
       clean_databases!
 
       doc = {
