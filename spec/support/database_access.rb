@@ -32,8 +32,8 @@ module DatabaseAccess
   ##
   # Resets member and admin lists for the test database to [].
   def clear_security
-    set_security({ 'users' => [], 'roles' => [] },
-                 { 'users' => [], 'roles' => [] })
+    set_security({ 'names' => [], 'roles' => [] },
+                 { 'names' => [], 'roles' => [] })
   end
 end
 
