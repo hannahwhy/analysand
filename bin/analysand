@@ -21,7 +21,7 @@ Type make_db to make an Analysand::Database object.  The default URI is
 
 To point at different databases, supply a URI object to make_db, e.g.
 
-    make_db(URI('https://couchdb.example.org:6984/supersekrit'))"
+    make_db(URI('https://couchdb.example.org:6984/supersekrit'))
 ------------------------------------------------------------------------------
 END
 
