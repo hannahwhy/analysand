@@ -82,11 +82,11 @@ module Analysand
     end
 
     def expand_view_path(view_name)
-      if view_name.include?('/')
+      if view_name.start_with?('_design') || !view_name.include?('/')
+        view_name
+      else
         design_doc, view_name = view_name.split('/', 2)
         "_design/#{design_doc}/_view/#{view_name}"
-      else
-        view_name
       end
     end
   end

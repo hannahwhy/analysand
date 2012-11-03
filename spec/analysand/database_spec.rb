@@ -150,6 +150,12 @@ module Analysand
         resp.rows.should == resp.body['rows']
       end
 
+      it 'works with the full document name' do
+        resp = db.view('_design/doc/_view/a_view')
+
+        resp.code.should == '200'
+      end
+
       it 'passes through view parameters' do
         resp = db.view('doc/a_view', :skip => 1)
 
