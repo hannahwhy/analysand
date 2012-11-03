@@ -2,12 +2,11 @@
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-require 'analysand/database'
+require 'analysand'
 require 'irb'
 require 'uri'
 
 $URI = URI('http://localhost:5984/analysand_test')
-
 
 def make_db(uri = $URI)
   Analysand::Database.new(uri)

@@ -1,5 +1,3 @@
-require "analysand/version"
-
-module Analysand
-  # Your code goes here...
-end
+require 'analysand/database'
+require 'analysand/instance'
+require 'analysand/version'
