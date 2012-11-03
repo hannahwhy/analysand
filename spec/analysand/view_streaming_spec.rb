@@ -33,44 +33,40 @@ module Analysand
       db.put!('abc123', {}, admin_credentials)
     end
 
-    before do
-      # make sure the view's built
-      db.head('_design/doc/_view/a_view', admin_credentials)
-    end
-
-    describe 'the streaming view response' do
-      it_should_behave_like 'a response' do
-        let(:response) { db.view('doc/a_view', :stream => true) }
+    shared_examples_for 'a view streamer' do
+      def get_view(options = {})
+        db.send(method, 'doc/a_view', options)
       end
-    end
 
-    describe '#view in streaming mode' do
-      let(:resp) { db.view('doc/a_view', :stream => true) }
+      describe 'response' do
+        it_should_behave_like 'a response' do
+          let(:response) { get_view(:stream => true) }
+        end
+      end
 
       it 'returns all rows in order' do
+        resp = get_view(:stream => true)
+
         resp.rows.map { |r| r['value'] }.should == (0...row_count).to_a
       end
 
       it 'yields docs' do
-        resp = db.view('doc/a_view', :stream => true, :include_docs => true)
+        resp = get_view(:include_docs => true, :stream => true)
 
         resp.docs.take(10).all? { |d| d.has_key?('_id') }.should be_true
       end
 
-      it 'returns error codes from failures' do
-        resp = db.view('doc/nonexistent', :stream => true)
-
-        resp.code.should == '404'
-      end
-
       it 'returns rows as soon as possible' do
+        # first, make sure the view's built
+        db.head('_design/doc/_view/a_view', admin_credentials)
+
         streamed = Benchmark.realtime do
-          resp = db.view('doc/a_view', :stream => true)
+          resp = get_view(:stream => true)
           resp.rows.take(10)
         end
 
         read_everything = Benchmark.realtime do
-          resp = db.view('doc/a_view')
+          resp = get_view
           resp.rows.take(10)
         end
 
@@ -78,7 +74,7 @@ module Analysand
       end
 
       it 'returns view metadata' do
-        resp = db.view('doc/a_view', :stream => true)
+        resp = get_view(:stream => true)
 
         resp.total_rows.should == row_count
         resp.offset.should == 0
@@ -86,10 +82,32 @@ module Analysand
 
       describe '#each' do
         it 'returns an Enumerator if no block is given' do
-          resp = db.view('doc/a_view', :stream => true)
+          resp = get_view(:stream => true)
 
           resp.rows.each.should be_instance_of(Enumerator)
         end
+      end
+    end
+
+    describe '#view in streaming mode' do
+      it_should_behave_like 'a view streamer' do
+        let(:method) { :view }
+      end
+
+      it 'returns error codes from failures' do
+        resp = db.view('doc/nonexistent', :stream => true)
+
+        resp.code.should == '404'
+      end
+    end
+
+    describe '#view! in streaming mode' do
+      it_should_behave_like 'a view streamer' do
+        let(:method) { :view! }
+      end
+
+      it 'raises CannotAccessView on failure' do
+        lambda { db.view!('doc/nonexistent', :stream => true) }.should raise_error(CannotAccessView)
       end
     end
   end
