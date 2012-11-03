@@ -1,0 +1,16 @@
+Issue numbers refer to issues on Analysand's Github tracker:
+https://github.com/yipdw/analysand/issues
+
+1.1.0 (2012-11-03)
+------------------
+
+* View streaming (#3)
+* ChangeWatchers now pass credentials when checking CouchDB status (#4)
+* Some code organization cleanups
+* require "analysand" now loads the Database and Instance classes
+
+
+1.0.1 (2012-10-01)
+------------------
+
+* Initial release
