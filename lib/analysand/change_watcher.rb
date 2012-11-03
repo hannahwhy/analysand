@@ -129,7 +129,9 @@ module Analysand
     #       ok && my_other_test
     #     end
     def connection_ok
-      test_http_connection(changes_feed_uri)
+      test_http_connection(changes_feed_uri) do |req|
+        customize_request(req)
+      end
     end
 
     def start

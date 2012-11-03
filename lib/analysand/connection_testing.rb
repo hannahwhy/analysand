@@ -7,9 +7,15 @@ module Analysand
     ##
     # Issues a HEAD request to the given URI.  If it responds with a success or
     # redirection code, returns true; otherwise, returns false.
+    #
+    # If a block is given, yields the request object for customization.
     def test_http_connection(uri)
       begin
-        resp = Net::HTTP.start(uri.host, uri.port) { |h| h.head(uri.request_uri) }
+        resp = Net::HTTP.start(uri.host, uri.port) do |h|
+          req = Net::HTTP::Head.new(uri.request_uri)
+          yield req if block_given?
+          h.request(req)
+        end
 
         case resp
         when Net::HTTPSuccess then true

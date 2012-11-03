@@ -39,6 +39,24 @@ module Analysand
       drop_databases!
     end
 
+    describe '#connection_ok' do
+      describe 'with a non-public change feed' do
+        before do
+          set_security({ 'names' => [admin_username] })
+        end
+
+        after do
+          clear_security
+        end
+
+        it 'passes credentials' do
+          watcher = TestWatcher.new(db, admin_credentials)
+
+          watcher.connection_ok.should be_true
+        end
+      end
+    end
+
     describe '#changes_feed_uri' do
       let!(:watcher) { TestWatcher.new(db, admin_credentials) }
 
