@@ -1,3 +1,5 @@
+require 'analysand/response_headers'
+require 'analysand/status_code_predicates'
 require 'forwardable'
 require 'json/ext'
 
@@ -12,6 +14,8 @@ module Analysand
   # 4. Delegates the [] property accessor to the body.
   class Response
     extend Forwardable
+    include ResponseHeaders
+    include StatusCodePredicates
 
     attr_reader :response
     attr_reader :body
@@ -24,24 +28,6 @@ module Analysand
       if !@response.body.nil? && !@response.body.empty?
         @body = JSON.parse(@response.body)
       end
-    end
-
-    def etag
-      response.get_fields('ETag').first.gsub('"', '')
-    end
-
-    def success?
-      c = code.to_i
-
-      c >= 200 && c <= 299
-    end
-
-    def conflict?
-      code.to_i == 409
-    end
-
-    def code
-      response.code
     end
   end
 end

@@ -1,3 +1,5 @@
+require 'analysand/response_headers'
+require 'analysand/status_code_predicates'
 require 'analysand/view_streaming/builder'
 require 'fiber'
 
@@ -16,12 +18,14 @@ module Analysand
   #     resp.rows.take(100)   # => first 100 rows
   class StreamingViewResponse
     include Enumerable
+    include ResponseHeaders
+    include StatusCodePredicates
 
-    # Private: The HTTP response.
+    # Internal: The HTTP response.
     #
     # This is set by Analysand::Database#stream_view.  The #etag and #code
     # methods use this for header information.
-    attr_accessor :http_response
+    attr_accessor :response
 
     def initialize
       @reader = Fiber.new { yield self; "" }
@@ -33,10 +37,6 @@ module Analysand
       #
       # We do this to provide the response headers as soon as possible.
       @reader.resume
-    end
-
-    def etag
-      http_response.get_fields('ETag').first.gsub('"', '')
     end
 
     # Public: Yields documents in the view stream.
@@ -53,20 +53,6 @@ module Analysand
 
     def get_docs
       each { |r| yield r['doc'] if r.has_key?('doc') }
-    end
-
-    def code
-      http_response.code
-    end
-
-    def success?
-      c = code.to_i
-
-      c >= 200 && c <= 299
-    end
-
-    def conflict?
-      code.to_i == 409
     end
 
     def total_rows
