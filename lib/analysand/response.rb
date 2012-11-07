@@ -6,10 +6,10 @@ module Analysand
   # The response object is a wrapper around Net::HTTPResponse that provides a
   # few amenities:
   #
-  # 1. A #success? method.  It returns true if the response code is between
-  #    (200..299) and false otherwise.
-  # 2. Automatic JSON deserialization of all response bodies.
-  # 3. Delegates the [] property accessor to the body.
+  # 1. A #success? method, which checks if 200 <= response code <= 299.
+  # 2. A #conflict method, which checks if response code == 409.
+  # 3. Automatic JSON deserialization of all response bodies.
+  # 4. Delegates the [] property accessor to the body.
   class Response
     extend Forwardable
 
@@ -34,6 +34,10 @@ module Analysand
       c = code.to_i
 
       c >= 200 && c <= 299
+    end
+
+    def conflict?
+      code.to_i == 409
     end
 
     def code

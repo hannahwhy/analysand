@@ -65,6 +65,10 @@ module Analysand
       c >= 200 && c <= 299
     end
 
+    def conflict?
+      code.to_i == 409
+    end
+
     def total_rows
       read until @generator.total_rows
 
