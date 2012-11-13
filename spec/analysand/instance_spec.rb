@@ -82,5 +82,43 @@ module Analysand
         end
       end
     end
+
+    describe '#get_config' do
+      let(:credentials) { admin_credentials }
+
+      it 'retrieves a configuration option' do
+        VCR.use_cassette('get_config') do
+          instance.get_config('stats/rate', admin_credentials).value.should == '"1000"'
+        end
+      end
+
+      it 'retrieves many configuration options' do
+        VCR.use_cassette('get_many_config') do
+          instance.get_config('stats', admin_credentials).value.should == {
+            'rate' => '1000',
+            'samples' => '[0, 60, 300, 900]'
+          }
+        end
+      end
+    end
+
+    describe '#set_config' do
+      let(:credentials) { admin_credentials }
+
+      it 'sets a configuration option' do
+        VCR.use_cassette('set_config') do
+          instance.set_config('stats/rate', 1200, admin_credentials)
+          instance.get_config('stats/rate', admin_credentials).value.should == '"1200"'
+        end
+      end
+
+      it 'accepts values from get_config' do
+        VCR.use_cassette('reload_config') do
+          samples = instance.get_config('stats/samples', admin_credentials).value
+          instance.set_config('stats/samples', samples, admin_credentials)
+          instance.get_config('stats/samples', admin_credentials).value.should == samples
+        end
+      end
+    end
   end
 end

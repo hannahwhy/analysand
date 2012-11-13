@@ -1,0 +1,40 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://admin:admin@localhost:5984/_config/stats/rate
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - ! '*/*'
+      User-Agent:
+      - Ruby
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - 30
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - CouchDB/1.2.0 (Erlang OTP/R15B02)
+      Date:
+      - Tue, 13 Nov 2012 17:03:28 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '7'
+      Cache-Control:
+      - must-revalidate
+    body:
+      encoding: US-ASCII
+      string: ! '"1000"
+
+'
+    http_version: 
+  recorded_at: Tue, 13 Nov 2012 17:03:28 GMT
+recorded_with: VCR 2.3.0

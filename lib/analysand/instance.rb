@@ -1,4 +1,5 @@
 require 'analysand/errors'
+require 'analysand/config_response'
 require 'analysand/http'
 require 'analysand/response'
 require 'base64'
@@ -70,6 +71,35 @@ module Analysand
   # Note: CouchDB doesn't always renew a session when asked; see the
   # documentation for #renew_session for more details.
   #
+  #
+  # Getting and setting instance configuration
+  # ------------------------------------------
+  #
+  #     v = instance.get_config('couchdb_httpd_auth/allow_persistent_cookies',
+  #       credentials)
+  #     v.value # => false
+  #
+  #     instance.set_config('couchdb_httpd_auth/allow_persistent_cookies',
+  #       true, credentials)
+  #     # => #<Response code=200 ...>
+  #
+  #     v = instance.get_config('couchdb_httpd_auth/allow_persistent_cookies',
+  #       credentials)
+  #     v.value #=> true
+  #
+  # You can get configuration at any level:
+  #
+  #     v = instance.get_config('', credentials)
+  #     v.body['stats']['rate']  # => "1000", or whatever you have it set to
+  #
+  # #get_config and #set_config both return Response-like objects.  You can
+  # check for failure or success that way:
+  #
+  #     v = instance.get_config('couchdb_httpd_auth/allow_persistent_cookies')
+  #     v.code # => '403'
+  #
+  #     instance.set_config('couchdb_httpd_auth/allow_persistent_cookies', false)
+  #     # => #<Response code=403 ...>
   class Instance
     include Http
     include Rack::Utils
@@ -125,6 +155,36 @@ module Analysand
       else
         [nil, resp]
       end
+    end
+
+    def get_config(key, credentials = nil)
+      ConfigResponse.new _get("_config/#{key}", credentials)
+    end
+
+    def set_config(key, value, credentials = nil)
+      # This is a bizarre transformation that deserves some explanation.
+      #
+      # CouchDB configuration is made available as strings containing JSON
+      # data.  GET /_config/stats, for example, will return something like
+      # this:
+      #
+      #     {"rate":"1000","samples":"[0, 60, 300, 900]"}
+      #
+      # However, I'd really like to write
+      #
+      #     instance.set_config('stats/samples', [0, 60, 300, 900])
+      #
+      # and I'd also like to be able to use values from get_config directly,
+      # just for symmetry:
+      #
+      #     v = instance1.get_config('stats/samples')
+      #     instance2.set_config('stats/samples', v)
+      #
+      # To accomplish this, we convert non-string values to JSON twice.
+      # Strings are passed through.
+      body = (String === value) ? value : value.to_json.to_json
+
+      ConfigResponse.new _put("_config/#{key}", credentials, {}, {}, body)
     end
 
     private
