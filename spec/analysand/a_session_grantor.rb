@@ -30,7 +30,7 @@ shared_examples_for 'a session grantor' do
     end
 
     it 'has the user roles' do
-      @session[:roles].should == role_locator[JSON.parse(@resp.body)]
+      @session[:roles].should == role_locator[@resp.body]
     end
 
     it 'has a session token' do

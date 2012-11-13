@@ -1,7 +1,9 @@
 require 'analysand/errors'
+require 'analysand/http'
+require 'analysand/response'
 require 'base64'
-require 'json/ext'
 require 'net/http/persistent'
+require 'rack/utils'
 require 'uri'
 
 module Analysand
@@ -69,27 +71,26 @@ module Analysand
   # documentation for #renew_session for more details.
   #
   class Instance
-    attr_reader :http
-    attr_reader :uri
+    include Http
+    include Rack::Utils
 
     def initialize(uri)
       raise InvalidURIError, 'You must supply an absolute URI' unless uri.absolute?
 
-      @http = Net::HTTP::Persistent.new('catalog_database')
+      @http = Net::HTTP::Persistent.new('analysand_database')
       @uri = uri
+
+      unless uri.path.end_with?('/')
+        uri.path += '/'
+      end
     end
 
     def establish_session(username, password)
-      path = uri + "/_session"
+      headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }
+      body = build_query('name' => username, 'password' => password)
+      resp = Response.new _post('_session', nil, {}, headers, body)
 
-      req = Net::HTTP::Post.new(path.to_s)
-      req.add_field('Content-Type', 'application/x-www-form-urlencoded')
-      req.body =
-        "name=#{URI.encode(username)}&password=#{URI.encode(password)}"
-
-      resp = http.request path, req
-
-      if Net::HTTPSuccess === resp
+      if resp.success?
         [session(resp), resp]
       else
         [nil, resp]
@@ -112,15 +113,11 @@ module Analysand
     # current time must be within a 10% timeout window (i.e. time left before
     # timeout < timeout * 0.9).
     def renew_session(old_session)
-      path = uri + "/_session"
+      headers = { 'Cookie' => old_session[:token] }
+      resp = Response.new _get('_session', nil, {}, headers)
 
-      req = Net::HTTP::Get.new(path.to_s)
-      req.add_field('Cookie', old_session[:token])
-
-      resp = http.request path, req
-
-      if Net::HTTPSuccess === resp
-        if !resp.get_fields('Set-Cookie')
+      if resp.success?
+        if !resp.cookies
           [old_session, resp]
         else
           [session(resp), resp]
@@ -133,16 +130,13 @@ module Analysand
     private
 
     def session(resp)
-      token = resp.get_fields('Set-Cookie').
-        detect { |c| c =~ /^AuthSession=([^;]+)/i }
-
+      token = resp.cookies.detect { |c| c =~ /^AuthSession=([^;]+)/i }
       fields = Base64.decode64($1).split(':')
       username = fields[0]
       time = fields[1].to_i(16)
 
-      body = JSON.parse(resp.body)
-      roles = body.has_key?('userCtx') ?
-        body['userCtx']['roles'] : body['roles']
+      roles = resp.body.has_key?('userCtx') ?
+        resp.body['userCtx']['roles'] : resp.body['roles']
 
       { :issued_at => time,
         :roles => roles,

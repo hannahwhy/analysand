@@ -1,11 +1,10 @@
 require 'analysand/errors'
+require 'analysand/http'
 require 'analysand/reading'
 require 'analysand/response'
 require 'analysand/viewing'
 require 'analysand/writing'
 require 'net/http/persistent'
-require 'rack/utils'
-require 'uri'
 
 module Analysand
   ##
@@ -263,13 +262,10 @@ module Analysand
   # connection per (uri.host, uri.port, thread) tuple, so connection pooling
   # is also done.
   class Database
-    include Rack::Utils
+    include Http
     include Reading
     include Viewing
     include Writing
-
-    attr_reader :http
-    attr_reader :uri
 
     def self.create!(uri, credentials = nil)
       new(uri).tap { |db| db.create!(credentials) }
@@ -321,48 +317,6 @@ module Analysand
     def drop!(credentials = nil)
       drop(credentials).tap do |resp|
         raise ex(CannotDropDatabase, resp) unless resp.success?
-      end
-    end
-
-    %w(Head Get Put Post Delete Copy).each do |m|
-      str = <<-END
-        def _#{m.downcase}(doc_id, credentials, query = {}, headers = {}, body = nil, block = nil)
-          _req(Net::HTTP::#{m}, doc_id, credentials, query, headers, body, block)
-        end
-      END
-
-      class_eval str, __FILE__, __LINE__
-    end
-
-    ##
-    # @private
-    def _req(klass, doc_id, credentials, query, headers, body, block)
-      uri = self.uri.dup
-      uri.path += URI.escape(doc_id)
-      uri.query = build_query(query) unless query.empty?
-
-      req = klass.new(uri.request_uri)
-
-      headers.each { |k, v| req.add_field(k, v) }
-      req.body = body if body && req.request_body_permitted?
-      set_credentials(req, credentials)
-
-      http.request(uri, req, &block)
-    end
-
-    ##
-    # Sets credentials on a request object.
-    #
-    # If creds is a hash containing :username and :password keys, HTTP basic
-    # authorization is used.  If creds is a string, the string is added as a
-    # cookie.
-    def set_credentials(req, creds)
-      return unless creds
-
-      if String === creds
-        req.add_field('Cookie', creds)
-      elsif creds[:username] && creds[:password]
-        req.basic_auth(creds[:username], creds[:password])
       end
     end
 

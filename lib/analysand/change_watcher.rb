@@ -81,7 +81,7 @@ module Analysand
     def initialize(database)
       @db = database
       @waiting = {}
-      @http_parser = Http::Parser.new(self)
+      @http_parser = ::Http::Parser.new(self)
       @json_parser = Yajl::Parser.new
       @json_parser.on_parse_complete = lambda { |doc| process(doc) }
 
