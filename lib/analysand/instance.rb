@@ -100,7 +100,14 @@ module Analysand
   #
   #     instance.set_config('couchdb_httpd_auth/allow_persistent_cookies', false)
   #     # => #<Response code=403 ...>
+  #
+  # If you want to set configuration and just want to let errors bubble
+  # up the stack, you can use the bang-variants:
+  #
+  #     instance.set_config!('stats/rate', 1000)
+  #     # => on non-2xx response, raises ConfigurationNotSaved
   class Instance
+    include Errors
     include Http
     include Rack::Utils
 
@@ -185,6 +192,12 @@ module Analysand
       body = (String === value) ? value : value.to_json.to_json
 
       ConfigResponse.new _put("_config/#{key}", credentials, {}, {}, body)
+    end
+
+    def set_config!(key, value, credentials = nil)
+      set_config(key, value, credentials).tap do |resp|
+        raise ex(ConfigurationNotSaved, resp) unless resp.success?
+      end
     end
 
     private

@@ -102,6 +102,14 @@ module Analysand
       end
     end
 
+    describe '#set_config!' do
+      it 'raises ConfigurationNotSaved on non-success' do
+        VCR.use_cassette('unauthorized_set_config') do
+          lambda { instance.set_config!('stats/rate', 1000) }.should raise_error(ConfigurationNotSaved)
+        end
+      end
+    end
+
     describe '#set_config' do
       let(:credentials) { admin_credentials }
 

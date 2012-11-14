@@ -1,0 +1,43 @@
+---
+http_interactions:
+- request:
+    method: !binary |-
+      cHV0
+    uri: http://localhost:5984/_config/stats/rate
+    body:
+      encoding: !binary |-
+        VVRGLTg=
+      string: ! '"1000"'
+    headers:
+      Accept:
+      - ! '*/*'
+      User-Agent:
+      - Ruby
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - 30
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    headers:
+      Server:
+      - CouchDB/1.2.0 (Erlang OTP/R15B02)
+      Date:
+      - Wed, 14 Nov 2012 05:43:26 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '64'
+      Cache-Control:
+      - must-revalidate
+    body:
+      encoding: !binary |-
+        VVMtQVNDSUk=
+      string: ! '{"error":"unauthorized","reason":"You are not a server admin."}
+
+'
+    http_version: 
+  recorded_at: Wed, 14 Nov 2012 05:43:26 GMT
+recorded_with: VCR 2.2.4

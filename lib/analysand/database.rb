@@ -262,6 +262,7 @@ module Analysand
   # connection per (uri.host, uri.port, thread) tuple, so connection pooling
   # is also done.
   class Database
+    include Errors
     include Http
     include Reading
     include Viewing
@@ -322,14 +323,6 @@ module Analysand
 
     def json_headers
       { 'Content-Type' => 'application/json' }
-    end
-
-    ##
-    # @private
-    def ex(klass, response)
-      klass.new("Expected response to have code 2xx, got #{response.code} instead").tap do |ex|
-        ex.response = response
-      end
     end
   end
 end
