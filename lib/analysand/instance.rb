@@ -61,17 +61,6 @@ module Analysand
   #     db.put(doc, session[:token])
   #
   #
-  # Renewing a session
-  # ------------------
-  #
-  #     auth, _ = instance.establish_session('username', 'password')
-  #     # ...time passes...
-  #     session, resp = instance.renew_session(auth)
-  #
-  # Note: CouchDB doesn't always renew a session when asked; see the
-  # documentation for #renew_session for more details.
-  #
-  #
   # Getting and setting instance configuration
   # ------------------------------------------
   #
@@ -126,37 +115,6 @@ module Analysand
       headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }
       body = build_query('name' => username, 'password' => password)
       resp = Response.new _post('_session', nil, {}, headers, body)
-      cookie = resp.session_cookie
-
-      [cookie ? session(cookie, resp) : nil, resp]
-    end
-
-    ##
-    # Attempts to renew a session.
-    #
-    # If the session was renewed, returns a session information hash identical
-    # in form to the hash returned by #establish_session.  If the session was
-    # not renewed, returns the passed-in hash.
-    #
-    #
-    # Renewal behavior
-    # ================
-    # 
-    # From cookie_auth_header/2 in CouchDB 1.2.0:
-    #
-    #    % Note: we only set the AuthSession cookie if:
-    #    %  * a valid AuthSession cookie has been received
-    #    %  * we are outside a 10% timeout window
-    #    %  * and if an AuthSession cookie hasn't already been set e.g. by a
-    #    %    login or logout handler.
-    #
-    # What this means is that #renew_session may not always receive a new
-    # cookie.  In particular, if you invoke #renew_session with a cookie K
-    # within (.1 * timeout) seconds of any other call that used K, you won't
-    # get a new cookie.
-    def renew_session(old_session)
-      headers = { 'Cookie' => old_session[:token] }
-      resp = Response.new _get('_session', nil, {}, headers)
       cookie = resp.session_cookie
 
       [cookie ? session(cookie, resp) : nil, resp]

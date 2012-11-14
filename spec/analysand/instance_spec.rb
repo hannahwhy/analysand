@@ -40,49 +40,6 @@ module Analysand
       end
     end
 
-    describe '#renew_session' do
-      let(:credentials) { admin_credentials }
-
-      before do
-        @session, _ = instance.establish_session(credentials[:username], credentials[:password])
-      end
-
-      describe 'if CouchDB refreshes the session cookie' do
-        around do |example|
-          VCR.use_cassette('get_session_refreshes_cookie') { example.call }
-        end
-
-        it_should_behave_like 'a session grantor' do
-          let(:result) { instance.renew_session(@session) }
-          let(:role_locator) do
-            lambda { |resp| resp['userCtx']['roles'] }
-          end
-        end
-      end
-
-      describe 'if CouchDB does not refresh the session cookie' do
-        around do |example|
-          VCR.use_cassette('get_session_does_not_refresh_cookie') { example.call }
-        end
-
-        it_should_behave_like 'a session grantor' do
-          let(:result) { instance.renew_session(@session) }
-          let(:role_locator) do
-            lambda { |resp| resp['userCtx']['roles'] }
-          end
-        end
-      end
-
-      describe 'given an invalid session' do
-        it 'returns [nil, response]' do
-          session, resp = instance.renew_session({ :token => 'AuthSession=wrong' })
-
-          session.should be_nil
-          resp.code.should == '400'
-        end
-      end
-    end
-
     describe '#get_config' do
       let(:credentials) { admin_credentials }
 
