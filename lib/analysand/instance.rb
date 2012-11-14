@@ -144,11 +144,19 @@ module Analysand
     #
     # Renewal behavior
     # ================
+    # 
+    # From cookie_auth_header/2 in CouchDB 1.2.0:
     #
-    # CouchDB will only send a new session cookie if the current time is
-    # close enough to the session timeout.  For CouchDB, that means that the
-    # current time must be within a 10% timeout window (i.e. time left before
-    # timeout < timeout * 0.9).
+    #    % Note: we only set the AuthSession cookie if:
+    #    %  * a valid AuthSession cookie has been received
+    #    %  * we are outside a 10% timeout window
+    #    %  * and if an AuthSession cookie hasn't already been set e.g. by a
+    #    %    login or logout handler.
+    #
+    # What this means is that #renew_session may not always receive a new
+    # cookie.  In particular, if you invoke #renew_session with a cookie K
+    # within (.1 * timeout) seconds of any other call that used K, you won't
+    # get a new cookie.
     def renew_session(old_session)
       headers = { 'Cookie' => old_session[:token] }
       resp = Response.new _get('_session', nil, {}, headers)
