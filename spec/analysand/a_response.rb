@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 shared_examples_for 'a response' do
-  %w(etag success? conflict? code).each do |m|
+  %w(etag success? conflict? code cookies session_cookie).each do |m|
     it "responds to ##{m}" do
       response.should respond_to(m)
     end
@@ -36,6 +36,28 @@ shared_examples_for 'a response' do
 
     it 'returns ETags without quotes' do
       response.etag.should_not include('"')
+    end
+  end
+
+  describe '#session_cookie' do
+    describe 'with an AuthSession cookie' do
+      let(:cookie) do
+        'AuthSession=foobar; Version=1; Expires=Wed, 14 Nov 2012 16:32:04 GMT; Max-Age=600; Path=/; HttpOnly'
+      end
+
+      before do
+        response.stub!(:cookies => [cookie])
+      end
+
+      it 'returns the AuthSession cookie' do
+        response.session_cookie.should == 'AuthSession=foobar'
+      end
+    end
+
+    describe 'without an AuthSession cookie' do
+      it 'returns nil' do
+        response.session_cookie.should be_nil
+      end
     end
   end
 end

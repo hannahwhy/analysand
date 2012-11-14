@@ -126,12 +126,9 @@ module Analysand
       headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }
       body = build_query('name' => username, 'password' => password)
       resp = Response.new _post('_session', nil, {}, headers, body)
+      cookie = resp.session_cookie
 
-      if resp.success?
-        [session(resp), resp]
-      else
-        [nil, resp]
-      end
+      [cookie ? session(cookie, resp) : nil, resp]
     end
 
     ##
@@ -160,16 +157,9 @@ module Analysand
     def renew_session(old_session)
       headers = { 'Cookie' => old_session[:token] }
       resp = Response.new _get('_session', nil, {}, headers)
+      cookie = resp.session_cookie
 
-      if resp.success?
-        if !resp.cookies
-          [old_session, resp]
-        else
-          [session(resp), resp]
-        end
-      else
-        [nil, resp]
-      end
+      [cookie ? session(cookie, resp) : nil, resp]
     end
 
     def get_config(key, credentials = nil)
@@ -210,9 +200,10 @@ module Analysand
 
     private
 
-    def session(resp)
-      token = resp.cookies.detect { |c| c =~ /^AuthSession=([^;]+)/i }
-      fields = Base64.decode64($1).split(':')
+    def session(cookie, resp)
+      token = cookie.split('=', 2).last
+      fields = Base64.decode64(token).split(':')
+
       username = fields[0]
       time = fields[1].to_i(16)
 
@@ -221,7 +212,7 @@ module Analysand
 
       { :issued_at => time,
         :roles => roles,
-        :token => token,
+        :token => cookie,
         :username => username
       }
     end
