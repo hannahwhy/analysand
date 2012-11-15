@@ -248,7 +248,13 @@ module Analysand
   #    as a cookie from CouchDB's Session API.  The string is used as the
   #    value of a Cookie header.
   #
-  # To get a token, use a CouchDB::Instance (ahem) instance.
+  # There are two ways to retrieve a token:
+  #
+  # 1. Establishing a session.  You can use
+  #    Analysand::Instance#establish_sesssion for this.
+  # 2. CouchDB may also issue updated session cookies as part of a response.
+  #    You can access such cookies using #session_cookie on the response
+  #    object.
   #
   # Omitting the credentials argument, or providing a form of credentials not
   # listed here, will result in no credentials being passed in the request.
