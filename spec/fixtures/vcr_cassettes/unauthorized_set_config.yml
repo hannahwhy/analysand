@@ -38,6 +38,6 @@ http_interactions:
       string: ! '{"error":"unauthorized","reason":"You are not a server admin."}
 
 '
-    http_version: 
+    http_version:
   recorded_at: Wed, 14 Nov 2012 05:43:26 GMT
 recorded_with: VCR 2.2.4

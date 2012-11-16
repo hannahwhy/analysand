@@ -35,6 +35,6 @@ http_interactions:
     body:
       encoding: US-ASCII
       string: ! "{\"total_rows\":1,\"offset\":0,\"rows\":[\r\n{\"id\":\"abc123\",\"key\":\"abc123\",\"value\":1}\r\n]}\n"
-    http_version: 
+    http_version:
   recorded_at: Fri, 02 Nov 2012 14:33:24 GMT
 recorded_with: VCR 2.3.0

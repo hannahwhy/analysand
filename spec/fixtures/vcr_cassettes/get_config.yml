@@ -35,6 +35,6 @@ http_interactions:
       string: ! '"1000"
 
 '
-    http_version: 
+    http_version:
   recorded_at: Tue, 13 Nov 2012 17:03:28 GMT
 recorded_with: VCR 2.3.0

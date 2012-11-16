@@ -35,6 +35,6 @@ http_interactions:
       string: ! '{"rate":"1000","samples":"[0, 60, 300, 900]"}
 
 '
-    http_version: 
+    http_version:
   recorded_at: Tue, 13 Nov 2012 17:11:24 GMT
 recorded_with: VCR 2.3.0

@@ -35,7 +35,7 @@ http_interactions:
       string: ! '"[0, 60, 300, 900]"
 
 '
-    http_version: 
+    http_version:
   recorded_at: Wed, 14 Nov 2012 00:27:29 GMT
 - request:
     method: put
@@ -72,7 +72,7 @@ http_interactions:
       string: ! '"[0, 60, 300, 900]"
 
 '
-    http_version: 
+    http_version:
   recorded_at: Wed, 14 Nov 2012 00:27:29 GMT
 - request:
     method: get
@@ -109,6 +109,6 @@ http_interactions:
       string: ! '"[0, 60, 300, 900]"
 
 '
-    http_version: 
+    http_version:
   recorded_at: Wed, 14 Nov 2012 00:27:29 GMT
 recorded_with: VCR 2.3.0

@@ -35,7 +35,7 @@ http_interactions:
       string: ! '"1000"
 
 '
-    http_version: 
+    http_version:
   recorded_at: Wed, 14 Nov 2012 00:18:14 GMT
 - request:
     method: get
@@ -72,6 +72,6 @@ http_interactions:
       string: ! '"1200"
 
 '
-    http_version: 
+    http_version:
   recorded_at: Wed, 14 Nov 2012 00:18:14 GMT
 recorded_with: VCR 2.3.0
