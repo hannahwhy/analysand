@@ -14,6 +14,19 @@ module Analysand
     attr_reader :http
     attr_reader :uri
 
+    def initialize(uri)
+      raise InvalidURIError, 'You must supply an absolute URI' unless uri.absolute?
+
+      @http = Net::HTTP::Persistent.new('analysand')
+      @uri = uri
+
+      # Document IDs and other database bits are appended to the URI path,
+      # so we need to make sure that it ends in a /.
+      unless uri.path.end_with?('/')
+        uri.path += '/'
+      end
+    end
+
     %w(Head Get Put Post Delete Copy).each do |m|
       str = <<-END
         def _#{m.downcase}(doc_id, credentials, query = {}, headers = {}, body = nil, block = nil)

@@ -282,19 +282,6 @@ module Analysand
       new(uri).drop(credentials)
     end
 
-    def initialize(uri)
-      raise InvalidURIError, 'You must supply an absolute URI' unless uri.absolute?
-
-      @http = Net::HTTP::Persistent.new('analysand_database')
-      @uri = uri
-
-      # Document IDs and other database bits are appended to the URI path,
-      # so we need to make sure that it ends in a /.
-      unless uri.path.end_with?('/')
-        uri.path += '/'
-      end
-    end
-
     def ping(credentials = nil)
       Response.new _get('', credentials)
     end

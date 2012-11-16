@@ -117,17 +117,6 @@ module Analysand
     include Http
     include Rack::Utils
 
-    def initialize(uri)
-      raise InvalidURIError, 'You must supply an absolute URI' unless uri.absolute?
-
-      @http = Net::HTTP::Persistent.new('analysand_database')
-      @uri = uri
-
-      unless uri.path.end_with?('/')
-        uri.path += '/'
-      end
-    end
-
     def post_session(*args)
       username, password = if args.length == 2
                              args
