@@ -17,25 +17,81 @@ module Analysand
 
     let(:instance) { Instance.new(instance_uri) }
 
-    describe '#establish_session' do
-      describe 'given admin credentials' do
-        let(:credentials) { admin_credentials }
+    describe '#post_session' do
+      describe 'with valid credentials' do
+        let(:resp) { instance.post_session(member1_username, member1_password) }
 
-        it_should_behave_like 'a session grantor'
+        it 'returns success' do
+          resp.should be_success
+        end
+
+        it 'returns a session cookie in the response' do
+          resp.session_cookie.should_not be_empty
+        end
       end
 
-      describe 'given member credentials' do
-        let(:credentials) { member1_credentials }
+      it 'supports hash credentials' do
+        resp = instance.post_session(member1_credentials)
 
-        it_should_behave_like 'a session grantor'
+        resp.should be_success
       end
 
-      describe 'given incorrect credentials' do
-        it 'returns [nil, response]' do
-          session, resp = instance.establish_session('wrong', 'wrong')
+      describe 'with invalid credentials' do
+        let(:resp) { instance.post_session(member1_username, 'wrong') }
 
-          session.should be_nil
-          resp.code.should == '401'
+        it 'does not return success' do
+          resp.should_not be_success
+        end
+      end
+    end
+
+    describe '#test_session' do
+      describe 'with a valid cookie' do
+        let(:resp) { instance.post_session(member1_username, member1_password) }
+        let(:cookie) { resp.session_cookie }
+
+        it 'returns success' do
+          resp = instance.get_session(cookie)
+
+          resp.should be_success
+        end
+
+        it 'returns valid' do
+          resp = instance.get_session(cookie)
+
+          resp.should be_valid
+        end
+      end
+
+      describe 'with an invalid cookie' do
+        let(:cookie) { 'AuthSession=YWRtaW46NTBBNDkwRUE6npTfHKz68y5q1FX4pWiB-Lzk5mQ' }
+
+        it 'returns success' do
+          resp = instance.get_session(cookie)
+
+          resp.should be_success
+        end
+
+        it 'does not return valid' do
+          resp = instance.get_session(cookie)
+
+          resp.should_not be_valid
+        end
+      end
+
+      describe 'with a malformed cookie' do
+        let(:cookie) { 'AuthSession=wrong' }
+
+        it 'does not return success' do
+          resp = instance.get_session(cookie)
+
+          resp.should_not be_success
+        end
+
+        it 'does not return valid' do
+          resp = instance.get_session(cookie)
+
+          resp.should_not be_valid
         end
       end
     end

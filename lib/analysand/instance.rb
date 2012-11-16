@@ -1,7 +1,8 @@
-require 'analysand/errors'
 require 'analysand/config_response'
+require 'analysand/errors'
 require 'analysand/http'
 require 'analysand/response'
+require 'analysand/session_response'
 require 'base64'
 require 'net/http/persistent'
 require 'rack/utils'
@@ -37,28 +38,44 @@ module Analysand
   # Establishing a session
   # ----------------------
   #
-  #     session, resp = instance.establish_session('username', 'password')
-  #     # for correct credentials:
-  #     # => [ {
-  #     #         :issued_at => (a UNIX timestamp),
-  #     #         :roles => [...roles...],
-  #     #         :token => 'AuthSession ...',
-  #     #         :username => (the supplied username)
-  #     #      },
-  #     #      the response
-  #     #    ]
-  #     #
-  #     # for incorrect credentials:
-  #     # => [nil, the response]
+  #     resp, = instance.post_session('username', 'password')
+  #     cookie = resp.session_cookie
   #
-  # The value in :token should be supplied as a cookie on subsequent requests,
-  # and can be passed as a credential when using Analysand::Database
-  # methods, e.g.
+  # For harmony, the same credentials hash accepted by database methods is
+  # also supported:
   #
-  #     db = Analysand::Database.new(...)
-  #     session, resp = instance.establish_session(username, password)
+  #     resp = instance.post_session(:username => 'username',
+  #                                  :password => 'password')
   #
-  #     db.put(doc, session[:token])
+  #
+  # resp.success? will be true if the session cookie is not empty, false
+  # otherwise.
+  #
+  #
+  # Testing a session cookie for validity
+  # -------------------------------------
+  #
+  #     resp = instance.get_session(cookie)
+  #
+  # In CouchDB 1.2.0, the response body is a JSON object that looks like
+  #
+  #       {
+  #           "info": {
+  #               "authentication_db": "_users",
+  #               "authentication_handlers": [
+  #                   "oauth",
+  #                   "cookie",
+  #                   "default"
+  #               ]
+  #           },
+  #           "ok": true,
+  #           "userCtx": {
+  #               "name": "username",
+  #               "roles": ["member"]
+  #           }
+  #       }
+  #
+  # resp.valid? will be true if userCtx['name'] is non-null, false otherwise.
   #
   #
   # Getting and setting instance configuration
@@ -111,13 +128,24 @@ module Analysand
       end
     end
 
-    def establish_session(username, password)
+    def post_session(*args)
+      username, password = if args.length == 2
+                             args
+                           else
+                             h = args.first
+                             [h[:username], h[:password]]
+                           end
+
       headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }
       body = build_query('name' => username, 'password' => password)
-      resp = Response.new _post('_session', nil, {}, headers, body)
-      cookie = resp.session_cookie
 
-      [cookie ? session(cookie, resp) : nil, resp]
+      Response.new _post('_session', nil, {}, headers, body)
+    end
+
+    def get_session(cookie)
+      headers = { 'Cookie' => cookie }
+
+      SessionResponse.new _get('_session', nil, {}, headers, nil)
     end
 
     def get_config(key, credentials = nil)
