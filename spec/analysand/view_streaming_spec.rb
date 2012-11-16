@@ -8,7 +8,7 @@ require File.expand_path('../a_response', __FILE__)
 module Analysand
   describe Database do
     let(:db) { Database.new(database_uri) }
-    let(:row_count) { 10000 }
+    let(:row_count) { 15000 }
 
     before(:all) do
       WebMock.disable!
