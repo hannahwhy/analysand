@@ -15,6 +15,10 @@ module Analysand
     attr_reader :uri
 
     def initialize(uri)
+      unless uri.respond_to?(:path) && uri.respond_to?(:absolute?)
+        uri = URI(uri)
+      end
+
       raise InvalidURIError, 'You must supply an absolute URI' unless uri.absolute?
 
       @http = Net::HTTP::Persistent.new('analysand')

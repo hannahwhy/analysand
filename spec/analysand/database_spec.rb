@@ -13,6 +13,14 @@ module Analysand
       it 'requires an absolute URI' do
         lambda { Database.new(URI("/abc")) }.should raise_error(InvalidURIError)
       end
+
+      it 'accepts URIs as strings' do
+        uri = 'http://localhost:5984/foo/'
+
+        db = Database.new(uri)
+
+        db.uri.should == URI(uri)
+      end
     end
 
     describe '.create!' do

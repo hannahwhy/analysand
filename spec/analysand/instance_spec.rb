@@ -13,6 +13,14 @@ module Analysand
       it 'requires an absolute URI' do
         lambda { Instance.new(URI("/abc")) }.should raise_error(InvalidURIError)
       end
+
+      it 'accepts URIs as strings' do
+        uri = 'http://localhost:5984/'
+
+        db = Instance.new(uri)
+
+        db.uri.should == URI(uri)
+      end
     end
 
     let(:instance) { Instance.new(instance_uri) }
