@@ -72,6 +72,5 @@ module Analysand
         req.basic_auth(creds[:username], creds[:password])
       end
     end
-
   end
 end
