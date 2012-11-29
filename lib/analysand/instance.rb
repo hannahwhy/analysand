@@ -117,6 +117,10 @@ module Analysand
     include Http
     include Rack::Utils
 
+    def initialize(uri)
+      init_http_client(uri)
+    end
+
     def post_session(*args)
       username, password = if args.length == 2
                              args

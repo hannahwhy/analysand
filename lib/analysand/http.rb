@@ -1,4 +1,4 @@
-require 'net/http'
+require 'net/http/persistent'
 require 'rack/utils'
 require 'uri'
 
@@ -14,7 +14,7 @@ module Analysand
     attr_reader :http
     attr_reader :uri
 
-    def initialize(uri)
+    def init_http_client(uri)
       unless uri.respond_to?(:path) && uri.respond_to?(:absolute?)
         uri = URI(uri)
       end
@@ -29,6 +29,10 @@ module Analysand
       unless uri.path.end_with?('/')
         uri.path += '/'
       end
+    end
+
+    def close
+      http.shutdown
     end
 
     %w(Head Get Put Post Delete Copy).each do |m|

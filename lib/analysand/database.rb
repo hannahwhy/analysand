@@ -4,7 +4,6 @@ require 'analysand/reading'
 require 'analysand/response'
 require 'analysand/viewing'
 require 'analysand/writing'
-require 'net/http/persistent'
 
 module Analysand
   ##
@@ -274,6 +273,10 @@ module Analysand
     include Viewing
     include Writing
 
+    def initialize(uri)
+      init_http_client(uri)
+    end
+
     def self.create!(uri, credentials = nil)
       new(uri).tap { |db| db.create!(credentials) }
     end
@@ -288,10 +291,6 @@ module Analysand
 
     def status(credentials = nil)
       ping(credentials).body
-    end
-
-    def close
-      http.shutdown
     end
 
     def create(credentials = nil)
