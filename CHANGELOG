@@ -1,7 +1,7 @@
 Issue numbers refer to issues on Analysand's Github tracker:
 https://github.com/yipdw/analysand/issues
 
-2.0.0 (yyyy-mm-dd)
+2.0.0 (2012-11-29)
 ------------------
 * Instance#establish_session and Instance#renew_session now return a (session,
   Analysand::Response pair)
