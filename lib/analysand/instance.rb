@@ -112,6 +112,25 @@ module Analysand
   #
   #     instance.set_config!('stats/rate', 1000)
   #     # => on non-2xx response, raises ConfigurationNotSaved
+  #
+  #
+  # Other instance-level services
+  # -----------------------------
+  #
+  # CouchDB can be extended with additional service handlers; authentication
+  # handlers are a popular example.
+  #
+  # Instance exposes #get, #put, and #post methods to access arbitrary
+  # endpoints.
+  #
+  # Examples:
+  #
+  #     instance.get('_log', {}, admin_credentials)
+  #     instance.post('_browserid', { 'assertion' => assertion },
+  #       { 'Content-Type' => 'application/json' })
+  #     instance.put('_config/httpd/bind_address', '192.168.0.1', {},
+  #       admin_credentials)
+  #
   class Instance
     include Errors
     include Http
@@ -119,6 +138,18 @@ module Analysand
 
     def initialize(uri)
       init_http_client(uri)
+    end
+
+    def get(path, headers = {}, credentials = nil)
+      _get(path, credentials, {}, headers)
+    end
+
+    def post(path, body = nil, headers = {}, credentials = nil)
+      _post(path, credentials, {}, headers, body)
+    end
+
+    def put(path, body = nil, headers = {}, credentials = nil)
+      _put(path, credentials, {}, headers, body)
     end
 
     def post_session(*args)
@@ -132,17 +163,17 @@ module Analysand
       headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }
       body = build_query('name' => username, 'password' => password)
 
-      Response.new _post('_session', nil, {}, headers, body)
+      Response.new post('_session', body, headers)
     end
 
     def get_session(cookie)
       headers = { 'Cookie' => cookie }
 
-      SessionResponse.new _get('_session', nil, {}, headers, nil)
+      SessionResponse.new get('_session', headers)
     end
 
     def get_config(key, credentials = nil)
-      ConfigResponse.new _get("_config/#{key}", credentials)
+      ConfigResponse.new get("_config/#{key}", {}, credentials)
     end
 
     def set_config(key, value, credentials = nil)
@@ -168,7 +199,7 @@ module Analysand
       # Strings are passed through.
       body = (String === value) ? value : value.to_json.to_json
 
-      ConfigResponse.new _put("_config/#{key}", credentials, {}, {}, body)
+      ConfigResponse.new put("_config/#{key}", body, {}, credentials)
     end
 
     def set_config!(key, value, credentials = nil)
