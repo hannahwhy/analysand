@@ -1,3 +1,4 @@
+require 'forwardable'
 require 'net/http/persistent'
 require 'rack/utils'
 require 'uri'
@@ -9,10 +10,19 @@ module Analysand
   # SHOULD be a Net::HTTP::Persistent instance, and @uri SHOULD be a URI
   # instance.
   module Http
+    extend Forwardable
+
     include Rack::Utils
 
     attr_reader :http
     attr_reader :uri
+
+    SSL_METHODS = %w(
+      certificate ca_file cert_store private_key
+      reuse_ssl_sessions ssl_version verify_callback verify_mode
+    ).map { |m| [m, "#{m}="] }.flatten
+
+    def_delegators :http, *SSL_METHODS
 
     def init_http_client(uri)
       unless uri.respond_to?(:path) && uri.respond_to?(:absolute?)
