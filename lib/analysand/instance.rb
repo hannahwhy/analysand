@@ -207,25 +207,6 @@ module Analysand
         raise ex(ConfigurationNotSaved, resp) unless resp.success?
       end
     end
-
-    private
-
-    def session(cookie, resp)
-      token = cookie.split('=', 2).last
-      fields = Base64.decode64(token).split(':')
-
-      username = fields[0]
-      time = fields[1].to_i(16)
-
-      roles = resp.body.has_key?('userCtx') ?
-        resp.body['userCtx']['roles'] : resp.body['roles']
-
-      { :issued_at => time,
-        :roles => roles,
-        :token => cookie,
-        :username => username
-      }
-    end
   end
 end
 
