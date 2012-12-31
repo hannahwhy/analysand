@@ -9,24 +9,16 @@ shared_examples_for 'a response' do
   end
 
   describe '#conflict?' do
-    describe 'if response code is 409' do
-      before do
-        response.stub!(:code => '409')
-      end
+    it 'returns true if response code is 409' do
+      response.stub!(:code => '409')
 
-      it 'returns true' do
-        response.should be_conflict
-      end
+      response.should be_conflict
     end
 
-    describe 'if response code is 200' do
-      before do
-        response.stub!(:code => '200')
-      end
+    it 'returns false if response code is 200' do
+      response.stub!(:code => '200')
 
-      it 'returns false' do
-        response.should_not be_conflict
-      end
+      response.should_not be_conflict
     end
   end
 
