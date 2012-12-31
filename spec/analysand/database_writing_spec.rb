@@ -338,6 +338,16 @@ module Analysand
         resp.should be_success
       end
 
+      describe 'if authorization fails' do
+        let(:wrong) do
+          { :username => 'wrong', :password => 'wrong' }
+        end
+
+        it 'raises Analysand::BulkOperationFailed' do
+          lambda { db.bulk_docs!([doc1, doc2], wrong) }.should raise_error(Analysand::BulkOperationFailed)
+        end
+      end
+
       describe 'if an operation fails' do
         before do
           doc2['_id'] = 'doc1'

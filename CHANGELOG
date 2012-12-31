@@ -1,8 +1,14 @@
 Issue numbers refer to issues on Analysand's Github tracker:
 https://github.com/yipdw/analysand/issues
 
+x.y.z (2012-12-31)
+------------------
+
+* Analysand::Writing#bulk_docs! now raises BulkOperationFailed on 401 responses
+
 2.0.0 (2012-11-29)
 ------------------
+
 * Instance#establish_session and Instance#renew_session now return a (session,
   Analysand::Response pair)
 * Share HTTP code between Database and Instance

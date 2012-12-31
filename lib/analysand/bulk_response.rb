@@ -6,7 +6,7 @@ module Analysand
   # records.
   class BulkResponse < Response
     def success?
-      body.none? { |r| r.has_key?('error') }
+      super && body.none? { |r| r.has_key?('error') }
     end
   end
 end
