@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 shared_examples_for 'a response' do
-  %w(etag success? conflict? code cookies session_cookie).each do |m|
+  %w(success? conflict? unauthorized?
+     etag code cookies session_cookie).each do |m|
     it "responds to ##{m}" do
       response.should respond_to(m)
     end
@@ -26,6 +27,20 @@ shared_examples_for 'a response' do
       it 'returns false' do
         response.should_not be_conflict
       end
+    end
+  end
+
+  describe '#unauthorized?' do
+    it 'returns true if response code is 401' do
+      response.stub!(:code => '401')
+
+      response.should be_unauthorized
+    end
+
+    it 'returns false if response code is 200' do
+      response.stub!(:code => '200')
+
+      response.should_not be_unauthorized
     end
   end
 
