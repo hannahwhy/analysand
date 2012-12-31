@@ -13,6 +13,8 @@ Features:
 * GET, PUT, DELETE, HEAD, COPY on documents
 * GET, PUT on document attachments
 * GET, POST on views
+* GET, PUT on server configuration
+* GET, PUT, POST on arbitrary service handlers
 * POST /_session
 * POST /_bulk_docs
 * View streaming
