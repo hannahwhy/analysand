@@ -1,5 +1,4 @@
-Analysand - a terrible burden for a couch
------------------------------------------
+1. Analysand
 
 Analysand is a CouchDB client library of dubious worth.  It was extracted from
 the a-m-v.org catalog application:
@@ -8,7 +7,7 @@ https://code.ninjawedding.org/git/amvorg-underground/catalog.git.
 Analysand was written for Ruby 1.9.  It is known to work on Ruby 1.9.3-p194 and
 Rubinius 2.0.0.
 
-Features:
+2. Features
 
 * GET, PUT, DELETE on databases
 * GET, PUT, DELETE, HEAD, COPY on documents
@@ -23,8 +22,7 @@ Features:
 * Cookie and HTTP Basic authentication for all of the above
 * Database objects can be safely shared across threads
 
-Developing Analysand
---------------------
+3. Development
 
 You'll need a CouchDB >= 1.1.0 instance.  I recommend not using a CouchDB
 instance that you're using for anything else; Analysand requires the presence
@@ -39,7 +37,12 @@ Naturally, we hang with all the cool kids:
 * Code Climate: https://codeclimate.com/github/yipdw/analysand
 * Gemnasium: https://gemnasium.com/yipdw/analysand
 
-License
--------
+4. License
 
 Copyright 2012 David Yip; made available under the MIT license.
+
+5. Special thanks
+
+Fear of Tigers, 3LAU, Ellie Goulding, TeddyLoid, Susumu Hirasawa.
+
+# vim:ts=2:sw=2:et:tw=78
