@@ -1,6 +1,22 @@
 Issue numbers refer to issues on Analysand's Github tracker:
 https://github.com/yipdw/analysand/issues
 
+3.0.0.pre (2012-02-26)
+----------------------
+
+* Instance#set_config renamed to Instance#put_config
+* Instance#put_admin, Instance#delete_admin for db admin setup
+* JSON encoding/decoding removed from Instance#*_config methods: all values are
+  sent to/received from CouchDB verbatim.  This means that you'll have to quote all values,
+  e.g.
+
+     instance.set_config("stats/rate", 1200)
+
+  becomes
+
+     instance.put_config("stats/rate", '"1200"')
+
+
 x.y.z (2012-12-31)
 ------------------
 
