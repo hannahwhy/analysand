@@ -2,6 +2,7 @@ require 'spec_helper'
 
 require 'analysand/errors'
 require 'analysand/instance'
+require 'json'
 require 'uri'
 require 'vcr'
 
@@ -141,16 +142,6 @@ module Analysand
       it 'sets a configuration option' do
         instance.put_config('foo/bar', '"1200"', admin_credentials)
         instance.get_config('foo/bar', admin_credentials).value.should == '"1200"'
-      end
-
-      it 'sets strings' do
-        instance.put_config('foo/bar', '"baz"', admin_credentials)
-        instance.get_config('foo/bar', admin_credentials).value.should == '"baz"'
-      end
-
-      it 'sets arrays' do
-        instance.put_config('foo/bar', '"[0, 60, 300, 900]"', admin_credentials)
-        instance.get_config('foo/bar', admin_credentials).value.should == '"[0, 60, 300, 900]"'
       end
 
       it 'roundtrips values from get_config' do
