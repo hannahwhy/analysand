@@ -147,5 +147,54 @@ module Analysand
         end
       end
     end
+
+    describe '#delete_config' do
+      let(:credentials) { admin_credentials }
+
+      before do
+        instance.set_config!('foo/bar', 1000, admin_credentials)
+      end
+
+      it 'deletes configuration options' do
+        instance.delete_config('foo/bar', admin_credentials)
+
+        resp = instance.get_config('foo/bar', admin_credentials)
+        resp.not_found?.should be_true
+      end
+    end
+
+    describe '#put_admin' do
+      let(:credentials) { admin_credentials }
+      let(:password) { 'password' }
+      let(:username) { 'new_admin' }
+
+      after do
+        instance.delete_admin!(username, credentials)
+      end
+
+      it 'adds an admin to the CouchDB admins list' do
+        instance.put_admin(username, password, admin_credentials)
+
+        resp = instance.post_session(username, password)
+        resp.body['roles'].should include('_admin')
+      end
+    end
+
+    describe '#delete_admin' do
+      let(:credentials) { admin_credentials }
+      let(:password) { 'password' }
+      let(:username) { 'new_admin' }
+
+      before do
+        instance.put_admin!(username, password, admin_credentials)
+      end
+
+      it 'deletes an admin from the CouchDB admins list' do
+        instance.delete_admin(username, admin_credentials)
+
+        resp = instance.post_session(username, password)
+        resp.should be_unauthorized
+      end
+    end
   end
 end

@@ -78,6 +78,24 @@ module Analysand
   # resp.valid? will be true if userCtx['name'] is non-null, false otherwise.
   #
   #
+  # Adding and removing admins
+  # --------------------------
+  #
+  #     instance.put_admin('admin', 'password', credentials)
+  #     # => #<ConfigResponse code=200 ...>
+  #     instance.delete_admin('admin', credentials)
+  #     # => #<ConfigResponse code=200 ...>
+  #
+  # Obviously, you'll need admin credentials to manage the admin list.
+  #
+  # There also exist bang-method variants:
+  #
+  #     instance.put_admin!('admin', 'password', bad_creds)
+  #     # => raises ConfigurationNotSaved on failure
+  #     instance.delete_admin!('admin', bad_creds)
+  #     # => raises ConfigurationNotDeleted on failure
+  #
+  #
   # Getting and setting instance configuration
   # ------------------------------------------
   #
@@ -92,6 +110,9 @@ module Analysand
   #     v = instance.get_config('couchdb_httpd_auth/allow_persistent_cookies',
   #       credentials)
   #     v.value #=> true
+  #
+  #     instance.delete_config('couchdb_httpd_auth/allow_persistent_cookies',
+  #       credentials)
   #
   # You can get configuration at any level:
   #
@@ -112,6 +133,9 @@ module Analysand
   #
   #     instance.set_config!('stats/rate', 1000)
   #     # => on non-2xx response, raises ConfigurationNotSaved
+  #
+  #     instance.delete_config!('stats/rate')
+  #     # => on non-2xx response, raises ConfigurationNotDeleted
   #
   #
   # Other instance-level services
@@ -152,6 +176,26 @@ module Analysand
       _put(path, credentials, {}, headers, body)
     end
 
+    def delete(path, headers = {}, credentials = nil)
+      _delete(path, credentials, {}, headers)
+    end
+
+    def put_admin(username, password, credentials = nil)
+      set_config("admins/#{username}", password, credentials)
+    end
+
+    def put_admin!(username, password, credentials = nil)
+      set_config!("admins/#{username}", password, credentials)
+    end
+
+    def delete_admin(username, credentials = nil)
+      delete_config("admins/#{username}", credentials)
+    end
+
+    def delete_admin!(username, credentials = nil)
+      delete_config!("admins/#{username}", credentials)
+    end
+
     def post_session(*args)
       username, password = if args.length == 2
                              args
@@ -185,6 +229,10 @@ module Analysand
       #
       #     {"rate":"1000","samples":"[0, 60, 300, 900]"}
       #
+      # That implies that you'd have to write the following setter:
+      #
+      #     instance.set_config('stats/samples', '[0, 60, 300, 900]')
+      #
       # However, I'd really like to write
       #
       #     instance.set_config('stats/samples', [0, 60, 300, 900])
@@ -205,6 +253,16 @@ module Analysand
     def set_config!(key, value, credentials = nil)
       set_config(key, value, credentials).tap do |resp|
         raise ex(ConfigurationNotSaved, resp) unless resp.success?
+      end
+    end
+
+    def delete_config(key, credentials = nil)
+      ConfigResponse.new delete("_config/#{key}", {}, credentials)
+    end
+
+    def delete_config!(key, credentials = nil)
+      delete_config(key, credentials).tap do |resp|
+        raise ex(ConfigurationNotDeleted, resp) unless resp.success?
       end
     end
   end

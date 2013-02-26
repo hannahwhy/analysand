@@ -14,6 +14,10 @@ module Analysand
       code.to_i == 401
     end
 
+    def not_found?
+      code.to_i == 404
+    end
+
     def conflict?
       code.to_i == 409
     end

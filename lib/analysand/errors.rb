@@ -22,6 +22,9 @@ module Analysand
   class ConfigurationNotSaved < DatabaseError
   end
 
+  class ConfigurationNotDeleted < DatabaseError
+  end
+
   class DocumentNotSaved < DatabaseError
   end
 
