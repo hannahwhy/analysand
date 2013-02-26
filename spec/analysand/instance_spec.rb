@@ -113,7 +113,9 @@ module Analysand
 
       it 'retrieves many configuration options' do
         VCR.use_cassette('get_many_config') do
-          instance.get_config('stats', admin_credentials).value.should == {
+          json = instance.get_config('stats', admin_credentials).value
+
+          JSON.parse(json).should == {
             'rate' => '1000',
             'samples' => '[0, 60, 300, 900]'
           }
@@ -121,30 +123,42 @@ module Analysand
       end
     end
 
-    describe '#set_config!' do
+    describe '#put_config!' do
       it 'raises ConfigurationNotSaved on non-success' do
-        VCR.use_cassette('unauthorized_set_config') do
-          lambda { instance.set_config!('stats/rate', 1000) }.should raise_error(ConfigurationNotSaved)
+        VCR.use_cassette('unauthorized_put_config') do
+          lambda { instance.put_config!('stats/rate', '"1000"') }.should raise_error(ConfigurationNotSaved)
         end
       end
     end
 
-    describe '#set_config' do
+    describe '#put_config' do
       let(:credentials) { admin_credentials }
 
-      it 'sets a configuration option' do
-        VCR.use_cassette('set_config') do
-          instance.set_config('stats/rate', 1200, admin_credentials)
-          instance.get_config('stats/rate', admin_credentials).value.should == '"1200"'
-        end
+      after do
+        instance.delete_config!('foo/bar', admin_credentials)
       end
 
-      it 'accepts values from get_config' do
-        VCR.use_cassette('reload_config') do
-          samples = instance.get_config('stats/samples', admin_credentials).value
-          instance.set_config('stats/samples', samples, admin_credentials)
-          instance.get_config('stats/samples', admin_credentials).value.should == samples
-        end
+      it 'sets a configuration option' do
+        instance.put_config('foo/bar', '"1200"', admin_credentials)
+        instance.get_config('foo/bar', admin_credentials).value.should == '"1200"'
+      end
+
+      it 'sets strings' do
+        instance.put_config('foo/bar', '"baz"', admin_credentials)
+        instance.get_config('foo/bar', admin_credentials).value.should == '"baz"'
+      end
+
+      it 'sets arrays' do
+        instance.put_config('foo/bar', '"[0, 60, 300, 900]"', admin_credentials)
+        instance.get_config('foo/bar', admin_credentials).value.should == '"[0, 60, 300, 900]"'
+      end
+
+      it 'roundtrips values from get_config' do
+        instance.put_config!('foo/bar', '"[0, 60, 300, 900]"', admin_credentials)
+
+        from_db = instance.get_config('foo/bar', admin_credentials).value
+        instance.put_config('foo/bar', from_db, admin_credentials)
+        instance.get_config('foo/bar', admin_credentials).value.should == from_db
       end
     end
 
@@ -152,7 +166,7 @@ module Analysand
       let(:credentials) { admin_credentials }
 
       before do
-        instance.set_config!('foo/bar', 1000, admin_credentials)
+        instance.put_config!('foo/bar', '"1000"', admin_credentials)
       end
 
       it 'deletes configuration options' do

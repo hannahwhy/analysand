@@ -3,22 +3,23 @@ require 'analysand/response'
 module Analysand
   # Public: Wraps responses from /_config.
   #
-  # Not all responses from sub-resources of _config return valid JSON objects,
-  # but JSON.parse expects to see a full JSON object.  This object implements a
-  # bit of a hacky workaround if the body does not start with a '{' and end
-  # with a '}', then it is not run through the JSON parser.
-  class ConfigResponse < Response
+  # GET/PUT/DELETE /_config does not return a valid JSON object in all cases.
+  # This response object therefore does The Simplest Possible Thing and just
+  # gives you back the response body as a string.
+  class ConfigResponse
+    include ResponseHeaders
+    include StatusCodePredicates
+
+    attr_reader :response
+    attr_reader :body
+
     alias_method :value, :body
 
     def initialize(response)
-      body = response.body.chomp
-
-      if body.start_with?('{') && body.end_with?('}')
-        super
-      else
-        @response = response
-        @body = body
-      end
+      @response = response
+      @body = response.body.chomp
     end
   end
 end
+
+# vim:ts=2:sw=2:et:tw=78
