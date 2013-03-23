@@ -164,12 +164,6 @@ module Analysand
     end
 
     ##
-    # Called by Celluloid::IO's actor shutdown code.
-    def finalize
-      @socket.close if @socket && !@socket.closed?
-    end
-
-    ##
     # Can be used to set query parameters.  query is a Hash.  The query hash
     # has two default parameters:
     #
@@ -266,6 +260,14 @@ module Analysand
       @socket.write(data.join("\r\n"))
       @socket.write("\r\n\r\n")
     end
+
+    ##
+    # @private
+    def disconnect
+      @socket.close if @socket && !@socket.closed?
+    end
+
+    finalizer :disconnect
 
     ##
     # @private
