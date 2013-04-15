@@ -4,6 +4,7 @@ require File.expand_path('../support/database_access', __FILE__)
 require File.expand_path('../support/example_isolation', __FILE__)
 require File.expand_path('../support/test_parameters', __FILE__)
 
+require 'celluloid/autostart'   # for ChangeWatcher specs
 require 'vcr'
 
 RSpec.configure do |config|
