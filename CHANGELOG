@@ -1,7 +1,7 @@
 Issue numbers refer to issues on Analysand's Github tracker:
 https://github.com/yipdw/analysand/issues
 
-3.0.0.pre (2012-02-26)
+3.0.0.pre (2013-02-26)
 ----------------------
 
 * Instance#set_config renamed to Instance#put_config
