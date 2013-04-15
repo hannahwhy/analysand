@@ -10,15 +10,15 @@ module Analysand
     let(:db) { Database.new(database_uri) }
     let(:row_count) { 15000 }
 
-    before(:all) do
+    before do
       WebMock.disable!
     end
 
-    after(:all) do
+    after do
       WebMock.enable!
     end
 
-    before(:all) do
+    before do
       clean_databases!
 
       doc = {
