@@ -1,6 +1,13 @@
 Issue numbers refer to issues on Analysand's Github tracker:
 https://github.com/yipdw/analysand/issues
 
+3.0.0.pre2 (2013-04-15)
+-----------------------
+
+* Change Celluloid dependency to 0.13.
+  Please note: Analysand does not require celluloid/autostart.  It's up to you
+  to decide whether or not you need that for your application.
+
 3.0.0.pre (2013-02-26)
 ----------------------
 
