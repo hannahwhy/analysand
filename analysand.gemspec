@@ -17,7 +17,7 @@ Gem::Specification.new do |gem|
 
   gem.required_ruby_version = '>= 1.9'
 
-  gem.add_dependency 'celluloid', '~> 0.13.0'
+  gem.add_dependency 'celluloid', '~> 0.14.0'
   gem.add_dependency 'celluloid-io'
   gem.add_dependency 'http_parser.rb'
   gem.add_dependency 'json'
