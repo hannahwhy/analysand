@@ -1,6 +1,11 @@
 Issue numbers refer to issues on Analysand's Github tracker:
 https://github.com/yipdw/analysand/issues
 
+3.0.0 (2013-07-08)
+------------------
+
+* Change Celluloid dependency to 0.14.
+
 3.0.0.pre2 (2013-04-15)
 -----------------------
 
