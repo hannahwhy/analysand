@@ -25,7 +25,7 @@ module Analysand
 
     describe '#docs' do
       describe 'if the view includes docs' do
-        subject { ViewResponse.new(stub(:body => resp_with_docs)) }
+        subject { ViewResponse.new(double(:body => resp_with_docs)) }
 
         it 'returns the value of the "doc" key in each row' do
           subject.docs.should == [{'foo' => 'bar'}]
@@ -33,7 +33,7 @@ module Analysand
       end
 
       describe 'if the view does not include docs' do
-        subject { ViewResponse.new(stub(:body => resp_without_docs)) }
+        subject { ViewResponse.new(double(:body => resp_without_docs)) }
 
         it 'returns []' do
           subject.docs.should == []

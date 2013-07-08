@@ -10,13 +10,13 @@ shared_examples_for 'a response' do
 
   describe '#conflict?' do
     it 'returns true if response code is 409' do
-      response.stub!(:code => '409')
+      response.stub(:code => '409')
 
       response.should be_conflict
     end
 
     it 'returns false if response code is 200' do
-      response.stub!(:code => '200')
+      response.stub(:code => '200')
 
       response.should_not be_conflict
     end
@@ -24,13 +24,13 @@ shared_examples_for 'a response' do
 
   describe '#unauthorized?' do
     it 'returns true if response code is 401' do
-      response.stub!(:code => '401')
+      response.stub(:code => '401')
 
       response.should be_unauthorized
     end
 
     it 'returns false if response code is 200' do
-      response.stub!(:code => '200')
+      response.stub(:code => '200')
 
       response.should_not be_unauthorized
     end
@@ -53,7 +53,7 @@ shared_examples_for 'a response' do
       end
 
       before do
-        response.stub!(:cookies => [cookie])
+        response.stub(:cookies => [cookie])
       end
 
       it 'returns the AuthSession cookie' do

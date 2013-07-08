@@ -186,11 +186,11 @@ module Analysand
       end
 
       it 'accepts credentials' do
-        lambda { db.ensure_full_commit(member1_credentials) }.should_not raise_error(ArgumentError)
+        lambda { db.ensure_full_commit(member1_credentials) }.should_not raise_error
       end
 
       it 'accepts a seq parameter' do
-        lambda { db.ensure_full_commit(member1_credentials, :seq => 10) }.should_not raise_error(ArgumentError)
+        lambda { db.ensure_full_commit(member1_credentials, :seq => 10) }.should_not raise_error
       end
     end
 
