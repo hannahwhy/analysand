@@ -11,6 +11,16 @@ RSpec.configure do |config|
   config.include DatabaseAccess
   config.include ExampleIsolation
   config.include TestParameters
+
+  config.around do |example|
+    begin
+      Celluloid.logger = nil
+      Celluloid.boot
+      example.call
+    ensure
+      Celluloid.shutdown
+    end
+  end
 end
 
 VCR.configure do |c|
