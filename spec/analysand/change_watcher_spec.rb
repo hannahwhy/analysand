@@ -3,7 +3,6 @@ require 'spec_helper'
 require 'analysand/change_watcher'
 require 'analysand/database'
 require 'celluloid'
-require 'celluloid/autostart'
 
 module Analysand
   describe ChangeWatcher do
