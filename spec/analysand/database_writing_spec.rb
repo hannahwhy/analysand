@@ -354,7 +354,7 @@ module Analysand
         end
 
         it 'raises Analysand::BulkOperationFailed' do
-          lambda { db.bulk_docs!([doc1, doc2]) }.should raise_error(Analysand::BulkOperationFailed)
+          lambda { db.bulk_docs!([doc1, doc2]) }.should raise_error(Analysand::BulkOperationFailed, /bulk operation failed/i)
         end
       end
     end

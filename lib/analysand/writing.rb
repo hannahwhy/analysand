@@ -29,7 +29,7 @@ module Analysand
 
     def bulk_docs!(docs, credentials = nil, options = {})
       bulk_docs(docs, credentials, options).tap do |resp|
-        raise ex(BulkOperationFailed, resp) unless resp.success?
+        raise bulk_ex(BulkOperationFailed, resp) unless resp.success?
       end
     end
 

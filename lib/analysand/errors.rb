@@ -10,6 +10,18 @@ module Analysand
         ex.response = response
       end
     end
+
+    # Like #ex, but customized for bulk operations.  (CouchDB's bulk_docs can
+    # return 2xx even on failure; you need to inspect the response body to
+    # figure out what happened.)
+    #
+    # klass    - the exception class
+    # response - the response object that caused the error
+    def bulk_ex(klass, response)
+      klass.new("Bulk operation failed (some records reported failure)").tap do |ex|
+        ex.response = response
+      end
+    end
   end
 
   class InvalidURIError < StandardError
