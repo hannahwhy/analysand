@@ -55,12 +55,6 @@ module Analysand
       end
     end
 
-    describe '#close' do
-      it "shuts down the current thread's connection" do
-        pending 'a good way to test this'
-      end
-    end
-
     describe '#head' do
       before do
         clean_databases!
