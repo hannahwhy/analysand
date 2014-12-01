@@ -164,7 +164,7 @@ module Analysand
         instance.delete_config('foo/bar', admin_credentials)
 
         resp = instance.get_config('foo/bar', admin_credentials)
-        resp.not_found?.should be_true
+        expect(resp.not_found?).to eq(true)
       end
     end
 

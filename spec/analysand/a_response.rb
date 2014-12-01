@@ -12,13 +12,13 @@ shared_examples_for 'a response' do
     it 'returns true if response code is 409' do
       response.stub(:code => '409')
 
-      response.should be_conflict
+      expect(response.conflict?).to eq(true)
     end
 
     it 'returns false if response code is 200' do
       response.stub(:code => '200')
 
-      response.should_not be_conflict
+      expect(response.conflict?).to eq(false)
     end
   end
 

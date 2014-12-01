@@ -52,7 +52,7 @@ module Analysand
         it 'passes credentials' do
           watcher = TestWatcher.new(db, admin_credentials)
 
-          watcher.connection_ok.should be_true
+          expect(watcher.connection_ok).to eq(true)
         end
       end
     end
@@ -96,7 +96,7 @@ module Analysand
       db.put('foo', { 'foo' => 'bar' }, admin_credentials)
       waiter.wait
 
-      watcher.changes.select { |r| r['id'] == 'foo' }.length.should == 1
+      expect(watcher.changes.select { |r| r['id'] == 'foo' }.length).to eq(1)
     end
   end
 end

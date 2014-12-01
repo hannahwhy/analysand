@@ -61,7 +61,7 @@ module Analysand
       it 'yields docs' do
         resp = get_view(:include_docs => true, :stream => true)
 
-        resp.docs.take(10).all? { |d| d.has_key?('_id') }.should be_true
+        expect(resp.docs.take(10).all? { |d| d.has_key?('_id') }).to eq(true)
       end
 
       it 'returns rows as soon as possible' do
