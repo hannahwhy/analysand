@@ -64,6 +64,11 @@ module Analysand
         expect(resp.docs.take(10).all? { |d| d.has_key?('_id') }).to eq(true)
       end
 
+      it 'yields keys' do
+        resp = get_view(:include_docs => false, :stream => true)
+        expect(resp.keys.take(10).each { |k| k }).to eq(['abc123'] * 10)
+      end
+
       it 'returns rows as soon as possible' do
         # first, make sure the view's built
         db.head('_design/doc/_view/a_view', admin_credentials)

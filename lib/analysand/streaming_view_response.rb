@@ -55,6 +55,22 @@ module Analysand
       each { |r| yield r['doc'] if r.has_key?('doc') }
     end
 
+    # Public: Yields document keys from the view stream.
+    #
+    # Note that ##keys and #rows advance the same stream, so expect to miss half
+    # your rows if you do something like
+    #
+    #     resp.keys.zip(resp.rows)
+    #
+    # If this is a problem for you, let me know and we can work out a solution.
+    def keys
+      to_enum(:get_keys)
+    end
+
+    def get_keys
+      each { |r| yield r['key'] if r.has_key?('key') }
+    end
+
     def total_rows
       read until @generator.total_rows
 
