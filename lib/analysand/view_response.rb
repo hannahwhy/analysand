@@ -20,5 +20,9 @@ module Analysand
     def docs
       rows.map { |r| r['doc'] }.compact
     end
+
+    def keys
+      rows.map { |r| r['key'] }.compact
+    end
   end
 end

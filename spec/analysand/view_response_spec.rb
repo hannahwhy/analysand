@@ -40,5 +40,23 @@ module Analysand
         end
       end
     end
+
+    describe '#keys' do
+      describe 'if the view includes docs' do
+        subject { ViewResponse.new(double(:body => resp_with_docs)) }
+
+        it 'returns the value of the "key" key in each row' do
+          subject.keys.should == ['foo']
+        end
+      end
+
+      describe 'if the view does not include docs' do
+        subject { ViewResponse.new(double(:body => resp_without_docs)) }
+
+        it 'returns []' do
+          subject.keys.should == ['foo']
+        end
+      end
+    end
   end
 end
