@@ -1,6 +1,11 @@
 Issue numbers refer to issues on Analysand's Github tracker:
 https://github.com/yipdw/analysand/issues
 
+3.1.0 (?)
+---------
+
+* New: StreamingViewResponse#keys (#6)
+
 3.0.2 (2014-12-01)
 -----------------
 
