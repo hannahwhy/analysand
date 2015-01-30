@@ -57,7 +57,7 @@ module Analysand
 
     # Public: Yields document keys from the view stream.
     #
-    # Note that ##keys and #rows advance the same stream, so expect to miss half
+    # Note that #keys and #rows advance the same stream, so expect to miss half
     # your rows if you do something like
     #
     #     resp.keys.zip(resp.rows)
