@@ -69,11 +69,27 @@ module Analysand
       end
     end
 
+    describe '#get' do
+      it 'retrieves documents with URI-escaped IDs' do
+        doc_id = CGI.escape('10067--http://ark.cdlib.org/ark:/13030/kt067nc38g')
+        net_http_put!(db, doc_id, { 'foo' => 'bar' })
+
+        db.get(doc_id).body['foo'].should == 'bar'
+      end
+    end
+
     describe '#get!' do
       before do
         clean_databases!
 
         db.put!('foo', { 'foo' => 'bar' })
+      end
+
+      it 'retrieves documents with URI-escaped IDs' do
+        doc_id = CGI.escape('10067--http://ark.cdlib.org/ark:/13030/kt067nc38g')
+        net_http_put!(db, doc_id, { 'foo' => 'bar' })
+
+        db.get!(doc_id).body['foo'].should == 'bar'
       end
 
       describe 'if the response code is 200' do

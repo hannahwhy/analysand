@@ -75,10 +75,15 @@ module Analysand
         resp.should be_success
       end
 
-      it 'escapes document IDs' do
-        db.put('an ID', doc)
+      it 'does not double-escape document IDs' do
+        doc_id = CGI.escape('10067--http://ark.cdlib.org/ark:/13030/kt067nc38g')
+        put(doc_id, doc)
 
-        db.get('an ID').should be_success
+        # Now we attempt to grab the escaped doc ID via good old HTTP.  If #put
+        # doesn't double-escape, this should not result in a 404.
+        resp = net_http_get(db, doc_id)
+
+        expect(resp.code.to_i).to eq(200)
       end
 
       it 'handles URN-like IDs' do
@@ -397,10 +402,13 @@ module Analysand
         db.get('bar')['foo'].should == 'bar'
       end
 
-      it 'escapes document IDs in URIs' do
-        db.copy(doc_id, 'an ID')
+      it 'copies documents with IDs that need to be escaped' do
+        target_doc_id = '10067--http://ark.cdlib.org/ark:/13030/kt067nc38g'
 
-        db.get('an ID')['foo'].should == 'bar'
+        db.copy(doc_id, target_doc_id)
+
+        resp = net_http_get(db, CGI.escape(target_doc_id))
+        expect(resp.code.to_i).to eq(200)
       end
     end
 
@@ -435,11 +443,17 @@ module Analysand
         resp.should be_success
       end
 
-      it 'escapes document IDs in URIs' do
-        @put_resp = db.put!('an ID', doc)
+      it 'deletes documents with IDs that need to be escaped' do
+        doc_id = CGI.escape('10067--http://ark.cdlib.org/ark:/13030/kt067nc38g')
+        resp = net_http_put!(db, doc_id, {})
+        rev = JSON.parse(resp.body)['rev']
 
-        resp = db.delete('an ID', rev)
-        resp.should be_success
+        resp = db.delete(doc_id, rev)
+
+        # DELETE normally returns 200, but a CouchDB server can also return 202
+        # if it is configured to operate in delayed commit mode.  This test
+        # accepts either as success.
+        expect(resp.code).to match(/\A20[02]\Z/)
       end
     end
 
