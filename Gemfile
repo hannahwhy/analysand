@@ -5,4 +5,5 @@ gemspec
 
 platform :rbx do
   gem 'rubysl'
+  gem 'psych'
 end
