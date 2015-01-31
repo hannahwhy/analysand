@@ -1,7 +1,7 @@
 language: ruby
 rvm:
   - rbx-2.4.1
-  - 2.0.0
+  - 2.2.0
 before_script:
   - "./script/setup_database.rb"
 services:
