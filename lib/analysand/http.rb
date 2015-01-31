@@ -59,7 +59,7 @@ module Analysand
     # @private
     def _req(klass, doc_id, credentials, query, headers, body, block)
       uri = self.uri.dup
-      uri.path += URI.escape(doc_id)
+      uri.path += doc_id
       uri.query = build_query(query) unless query.empty?
 
       req = klass.new(uri.request_uri)

@@ -229,6 +229,9 @@ module Analysand
   #
   #     vdb.copy('source', "destination?rev=#{rev}", credentials)
   #
+  # NOTE: CouchDB 1.5.0 and 1.6.1 expect an _unescaped_ destination document
+  # ID.
+  #
   #
   # Acceptable credentials
   # ======================
