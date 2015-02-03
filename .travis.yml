@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - rbx-2.4.1
+  - rbx-2.5.1
   - 2.2.0
 before_script:
   - "./script/setup_database.rb"
