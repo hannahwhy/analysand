@@ -10,8 +10,8 @@ Analysand::Database methods no longer perform any escaping on document IDs.
 You will have to modify your code to use CGI.escape, Rack::Utils::escape_path,
 etc. when passing in document IDs.  (#7)
 
-3.1.0 (?)
----------
+3.1.0 (2015-02-03)
+------------------
 
 * New: StreamingViewResponse#keys (#6)
 
