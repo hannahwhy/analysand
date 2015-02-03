@@ -2,6 +2,12 @@ language: ruby
 rvm:
   - rbx-2.5.1
   - 2.2.0
+env:
+  - RBXOPT=-Xint
+matrix:
+  exclude:
+    - rvm: 2.2.0
+      env: RBXOPT=-Xint
 before_script:
   - "./script/setup_database.rb"
 services:
