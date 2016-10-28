@@ -31,7 +31,7 @@ module Analysand
 
       raise InvalidURIError, 'You must supply an absolute URI' unless uri.absolute?
 
-      @http = Net::HTTP::Persistent.new('analysand')
+      @http = Net::HTTP::Persistent.new(name: 'analysand')
       @uri = uri
 
       # Document IDs and other database bits are appended to the URI path,
